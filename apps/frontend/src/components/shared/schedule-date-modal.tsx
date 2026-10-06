@@ -23,7 +23,8 @@ interface ScheduleDateModalProps {
   title: string
   description: string
   dateLabel: string
-  disabled?: boolean
+  triggerLabel: string
+  disabled: boolean
   onSchedule: (scheduledDate: string) => Promise<void>
 }
 
@@ -31,6 +32,7 @@ export function ScheduleDateModal({
   title,
   description,
   dateLabel,
+  triggerLabel,
   disabled,
   onSchedule,
 }: ScheduleDateModalProps): React.JSX.Element {
@@ -58,7 +60,7 @@ export function ScheduleDateModal({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button disabled={disabled}>Schedule</Button>
+        <Button disabled={disabled}>{triggerLabel}</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>

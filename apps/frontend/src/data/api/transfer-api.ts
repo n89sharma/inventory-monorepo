@@ -1,6 +1,6 @@
 import { api } from '@/data/api/axios-client'
 import { toDateParam } from '@/lib/date-param'
-import type { TransferForm, TransferMetadataForm } from '@/ui-types/transfer-form-types'
+import type { TransferMetadataForm } from '@/ui-types/transfer-form-types'
 import {
   type SelectOption,
   getIdOrNullFromSelection,
@@ -68,13 +68,16 @@ export async function getTransferHistory(transferNumber: string): Promise<Collec
   return CollectionHistorySchema.parse(data)
 }
 
-export async function createTransfer(t: TransferForm): Promise<CreateTransferResponse> {
+export async function createTransfer(
+  metadata: TransferMetadataForm,
+  assets: AssetSummary[],
+): Promise<CreateTransferResponse> {
   const createTransferBody = CreateTransferSchema.parse({
-    origin: getSelectedOrNull(t.origin)!,
-    destination: getSelectedOrNull(t.destination)!,
-    transporter: t.transporter!,
-    comment: t.comment,
-    assets: t.assets as CreateTransfer['assets'],
+    origin: getSelectedOrNull(metadata.origin)!,
+    destination: getSelectedOrNull(metadata.destination)!,
+    transporter: metadata.transporter!,
+    comment: metadata.comment === '' ? null : metadata.comment,
+    assets,
   } satisfies CreateTransfer)
   const { data } = await api.post<CreateTransferResponse>('/transfers', createTransferBody)
   return CreateTransferResponseSchema.parse(data)

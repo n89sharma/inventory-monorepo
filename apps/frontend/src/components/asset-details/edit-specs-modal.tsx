@@ -57,9 +57,6 @@ interface EditSpecsModalProps {
 const HAS_ERRORS_READINESS = 'HAS_ERRORS'
 const UNTESTED_READINESS = 'UNTESTED'
 
-// An asset's specs are edited on their own; there is no unsaved sibling list to compare against.
-const NO_DRAFT_SERIAL_NUMBERS: string[] = []
-
 const EMPTY_SPECS_FORM: SpecsForm = {
   model: null,
   serialNumber: '',
@@ -207,7 +204,6 @@ export function EditSpecsModal({
   const serialCheck = useSerialNumberCheck({
     serialNumber: currSerialNumber ?? '',
     persistedAsset,
-    draftSerialNumbers: NO_DRAFT_SERIAL_NUMBERS,
   })
   const guard = useUnsavedChangesGuard(form.formState.isDirty, onOpenChange, () => {
     form.reset(undefined, DISCARD_USER_EDITS)

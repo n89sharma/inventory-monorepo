@@ -247,7 +247,6 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSearchRow[] 
               onClear={clearSelection}
               refreshKey={refreshKey}
               currentCollectionType={section}
-              returnTo={`/${section}/${collectionId}`}
               invoicePrefill={getInvoicePrefill?.(entity)}
               onBulkRemove={onBulkRemove}
               totalCount={filteredRowIds.length}

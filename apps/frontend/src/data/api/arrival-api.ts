@@ -1,6 +1,6 @@
 import { api } from '@/data/api/axios-client'
 import { toDateParam } from '@/lib/date-param'
-import type { ArrivalForm, ArrivalMetadataForm, AssetForm } from '@/ui-types/arrival-form-types'
+import type { ArrivalMetadataForm, AssetForm } from '@/ui-types/arrival-form-types'
 import {
   type SelectOption,
   getIdOrNullFromSelection,
@@ -63,37 +63,12 @@ export async function getArrivalDetail(arrivalNumber: string): Promise<ArrivalDe
   return ArrivalDetailSchema.parse(data)
 }
 
-export async function createArrival(a: ArrivalForm): Promise<CreateArrivalResponse> {
+export async function createArrival(metadata: ArrivalMetadataForm): Promise<CreateArrivalResponse> {
   const createArrivalBody = CreateArrivalSchema.parse({
-    vendor: a.vendor!,
-    transporter: a.transporter!,
-    warehouse: getSelectedOrNull(a.warehouse)!,
-    comment: a.comment,
-    assets: a.assets.map((s) => ({
-      model: s.model!,
-      serialNumber: s.serialNumber,
-      meterBlack: s.meterBlack!,
-      meterColour: s.meterColour!,
-      cassettes: s.cassettes!,
-      readiness: getSelectedOrNull(s.readiness)!,
-      countryOfOrigin: s.countryOfOrigin,
-      manufacturedYear: s.manufacturedYear,
-      componentId: s.component?.id ?? null,
-      coreFunctions: s.coreFunctions,
-      drumLifeC: s.drumLifeC!,
-      drumLifeM: s.drumLifeM!,
-      drumLifeY: s.drumLifeY!,
-      drumLifeK: s.drumLifeK!,
-      tonerLifeC: s.tonerLifeC!,
-      tonerLifeM: s.tonerLifeM!,
-      tonerLifeY: s.tonerLifeY!,
-      tonerLifeK: s.tonerLifeK!,
-      errors: s.errors,
-      comment: s.comment,
-      isDamaged: s.isDamaged,
-      damageNotes: s.damageNotes,
-      duplicateSerialAcknowledged: s.duplicateSerialAcknowledged,
-    })) as CreateArrival['assets'],
+    vendor: metadata.vendor!,
+    transporter: metadata.transporter!,
+    warehouse: getSelectedOrNull(metadata.warehouse)!,
+    comment: metadata.comment === '' ? null : metadata.comment,
   } satisfies CreateArrival)
   const { data } = await api.post<CreateArrivalResponse>('/arrivals', createArrivalBody)
   return CreateArrivalResponseSchema.parse(data)

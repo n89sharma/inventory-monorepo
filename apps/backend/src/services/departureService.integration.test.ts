@@ -37,6 +37,7 @@ import {
   addAssetsToDepartureAndRecord,
   completeDeparture,
   createDeparture,
+  deleteDeparture,
   finishLoadingDeparture,
   getDeparture,
   getDepartureSummaries,
@@ -144,6 +145,17 @@ describe('departureService', () => {
   }
 
   describe('create and read', () => {
+    it('creates an empty draft departure', async () => {
+      const departureNumber = await createDraft([])
+
+      expect(await getDepartureStatus(departureNumber)).toBe(DEPARTURE_STATUS.DRAFT)
+      expect(
+        await prisma.assetDeparture.count({
+          where: { departure: { departure_number: departureNumber } },
+        }),
+      ).toBe(0)
+    })
+
     it('returns asset cost, redacted by role permissions', async () => {
       const [asset] = await createArrivedAssets(refs, 1)
       const departureNumber = await createDraft([asset])
@@ -368,13 +380,7 @@ describe('departureService', () => {
     })
 
     it('rejects scheduling an empty or already scheduled departure', async () => {
-      const [asset] = await createArrivedAssets(refs, 1)
-      const departureNumber = await createDraft([asset])
-      await addAssetsToDepartureAndRecord(
-        departureNumber,
-        { assetIdsToAdd: [], assetIdsToRemove: [asset.id] },
-        refs.userId,
-      )
+      const departureNumber = await createDraft([])
 
       await expect(
         scheduleDeparture(departureNumber, { departure_date: TODAY }, refs.userId),
@@ -779,6 +785,38 @@ describe('departureService', () => {
       expect(priceChange?.before?.sale_price).toBe(SEEDED_ASSET_COST.sale_price)
       expect(priceChange?.after?.sale_price).toBeNull()
       expect(changesFor('Asset').some((c) => c.after?.status === ASSET_STATUS.IN_STOCK)).toBe(true)
+    })
+  })
+
+  describe('deleteDeparture', () => {
+    it('deletes an empty draft departure', async () => {
+      const departureNumber = await createDraft([])
+
+      await deleteDeparture(departureNumber, refs.userId)
+
+      expect(
+        await prisma.departure.findUnique({ where: { departure_number: departureNumber } }),
+      ).toBeNull()
+    })
+
+    it('refuses to delete a draft departure that still holds assets', async () => {
+      const [asset] = await createArrivedAssets(refs, 1)
+      const departureNumber = await createDraft([asset])
+
+      await expect(deleteDeparture(departureNumber, refs.userId)).rejects.toThrow(
+        `Departure ${departureNumber} cannot be deleted because it still has 1 asset`,
+      )
+    })
+
+    it('refuses to delete a scheduled departure', async () => {
+      const [asset] = await createArrivedAssets(refs, 1)
+      const departureNumber = await createScheduled([asset.id])
+
+      await expect(deleteDeparture(departureNumber, refs.userId)).rejects.toThrow(ConflictError)
+    })
+
+    it('reports an unknown departure as not found', async () => {
+      await expect(deleteDeparture('D-YYZ-0000000', refs.userId)).rejects.toThrow(NotFoundError)
     })
   })
 })

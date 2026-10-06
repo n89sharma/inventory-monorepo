@@ -23,7 +23,11 @@ import {
 } from 'shared-types'
 import { prisma } from '../src/prisma.js'
 import { todayYmd } from '../src/lib/date-only.js'
-import { createArrival, getArrival } from '../src/services/arrivalService.js'
+import {
+  createArrival,
+  createSingleArrivalAsset,
+  getArrival,
+} from '../src/services/arrivalService.js'
 import {
   createDeparture,
   scanAssetLoaded,
@@ -77,13 +81,6 @@ export const TEST_INVOICE_REFERENCE = 'TEST-REF'
 // Asset serial numbers aren't unique in the schema, but a per-call counter keeps
 // built assets distinguishable across multiple arrivals in one run.
 let serialCounter = 0
-
-// Build a non-empty tuple from an array (Create*Schema asset lists are `.nonempty()`).
-function nonEmpty<T>(items: T[]): [T, ...T[]] {
-  const [first, ...rest] = items
-  if (first === undefined) throw new Error('expected at least one item')
-  return [first, ...rest]
-}
 
 export async function seedArrivalTestData(): Promise<ArrivalTestData> {
   // Seed every status so any transition target (IN_STOCK, HELD, SOLD, …) resolves.
@@ -263,7 +260,7 @@ export async function seedArrivalTestData(): Promise<ArrivalTestData> {
   }
 }
 
-function buildAsset(refs: ArrivalTestData): CreateAsset {
+export function buildAsset(refs: ArrivalTestData): CreateAsset {
   serialCounter += 1
   // errors: [] and componentId: null keep validateErrorBrands / validateComponentBrands
   // short-circuiting, so no Error/Component reference rows are needed.
@@ -294,15 +291,22 @@ function buildAsset(refs: ArrivalTestData): CreateAsset {
   }
 }
 
-export function buildCreateArrivalInput(refs: ArrivalTestData, assetCount = 2): CreateArrival {
-  const assets = Array.from({ length: assetCount }, () => buildAsset(refs))
+export function buildCreateArrivalInput(refs: ArrivalTestData): CreateArrival {
   return CreateArrivalSchema.parse({
     vendor: refs.vendor,
     transporter: refs.transporter,
     warehouse: refs.warehouse,
     comment: null,
-    assets,
   })
+}
+
+// Create an arrival, then add `count` assets one at a time, the way the arrival page does.
+export async function createArrivalWithAssets(refs: ArrivalTestData, count: number) {
+  const arrivalNumber = await createArrival(buildCreateArrivalInput(refs), refs.userId)
+  for (let i = 0; i < count; i += 1) {
+    await createSingleArrivalAsset(arrivalNumber, buildAsset(refs), refs.userId)
+  }
+  return arrivalNumber
 }
 
 // Create an arrival and return its assets as real AssetSummary objects (status IN_STOCK).
@@ -312,7 +316,7 @@ export async function createArrivedAssets(
   refs: ArrivalTestData,
   count = 1,
 ): Promise<AssetSummary[]> {
-  const arrivalNumber = await createArrival(buildCreateArrivalInput(refs, count), refs.userId)
+  const arrivalNumber = await createArrivalWithAssets(refs, count)
   const { assets } = await getArrival(arrivalNumber, ALL_PRICE_PERMISSIONS)
   return assets.map(searchRowToAssetSummary)
 }
@@ -326,7 +330,7 @@ export function buildCreateHoldInput(refs: ArrivalTestData, assets: AssetSummary
     created_for_id: refs.userId,
     customer_id: refs.customer.id,
     notes: null,
-    assets: nonEmpty(assets),
+    assets,
   }
 }
 
@@ -340,7 +344,7 @@ export function buildCreateDepartureInput(
     transporter: refs.transporter,
     salesperson_id: refs.userId,
     comment: null,
-    assets: nonEmpty(assets),
+    assets,
   }
 }
 
@@ -353,7 +357,7 @@ export function buildCreateTransferInput(
     destination: refs.warehouse2,
     transporter: refs.transporter,
     comment: null,
-    assets: nonEmpty(assets),
+    assets,
   }
 }
 
@@ -370,7 +374,7 @@ export function buildCreateInvoiceInput(
     invoice_type_id: invoiceTypeId,
     is_cleared: isCleared,
     comment: null,
-    assets: nonEmpty(assets),
+    assets,
   }
 }
 

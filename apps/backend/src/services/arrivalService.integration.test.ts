@@ -2,9 +2,11 @@ import { ASSET_STATUS, searchRowToAssetSummary, type SplitArrival } from 'shared
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
 import {
   ArrivalTestData,
+  buildAsset,
   buildCreateArrivalInput,
   buildCreateInvoiceInput,
   cleanupTransactionalData,
+  createArrivalWithAssets,
   TEST_INVOICE_REFERENCE,
   assetCostOf,
   ALL_PRICE_PERMISSIONS,
@@ -20,6 +22,7 @@ import { ConflictError, NotFoundError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
 import {
   createArrival,
+  createSingleArrivalAsset,
   deleteArrival,
   getArrival,
   getArrivalAssetForUpdate,
@@ -70,66 +73,66 @@ describe('createArrival', () => {
     await cleanupTransactionalData()
   })
 
-  it('sets every arrived asset to IN_STOCK', async () => {
-    const input = buildCreateArrivalInput(refs)
-    const arrivalNumber = await createArrival(input, refs.userId)
+  it('creates an arrival with no assets', async () => {
+    const arrivalNumber = await createArrival(buildCreateArrivalInput(refs), refs.userId)
 
-    const assets = await prisma.asset.findMany({
-      where: { arrival: { arrival_number: arrivalNumber } },
-      select: { status: { select: { status: true } } },
-    })
+    expect(arrivalNumber).toMatch(/^A-YYZ-\d{7}$/)
+    expect(await getArrivalAssetIds(arrivalNumber)).toEqual([])
+  })
+})
 
-    expect(assets).toHaveLength(input.assets.length)
-    expect(assets.every((a) => a.status.status === ASSET_STATUS.IN_STOCK)).toBe(true)
+describe('createSingleArrivalAsset', () => {
+  let refs: ArrivalTestData
+
+  beforeAll(async () => {
+    refs = await seedArrivalTestData()
   })
 
-  it('numbers the arrival A-<cityCode>-<7-digit sequence>', async () => {
-    const arrivalNumber = await createArrival(buildCreateArrivalInput(refs, 1), refs.userId)
-    expect(arrivalNumber).toMatch(/^A-YYZ-\d{7}$/)
+  afterAll(async () => {
+    await cleanupTransactionalData()
+  })
+
+  it('arrives the asset IN_STOCK with a <cityCode>-<7-digit sequence> barcode', async () => {
+    const arrivalNumber = await createArrival(buildCreateArrivalInput(refs), refs.userId)
+
+    const created = await createSingleArrivalAsset(arrivalNumber, buildAsset(refs), refs.userId)
+
+    const asset = await prisma.asset.findUniqueOrThrow({
+      where: { id: created.id },
+      select: { barcode: true, status: { select: { status: true } } },
+    })
+    expect(asset.barcode).toMatch(/^YYZ-\d{7}$/)
+    expect(asset.status.status).toBe(ASSET_STATUS.IN_STOCK)
   })
 
   it('stores the damage recorded on arrival, and no note on an undamaged asset', async () => {
-    const input = buildCreateArrivalInput(refs, 2)
-    input.assets[0].isDamaged = true
-    input.assets[0].damageNotes = 'Dented side panel'
+    const arrivalNumber = await createArrival(buildCreateArrivalInput(refs), refs.userId)
+    const damaged = { ...buildAsset(refs), isDamaged: true, damageNotes: 'Dented side panel' }
     // A note typed before the box was unticked must not survive the write.
-    input.assets[1].damageNotes = 'Typed then withdrawn'
-    const arrivalNumber = await createArrival(input, refs.userId)
+    const undamaged = { ...buildAsset(refs), damageNotes: 'Typed then withdrawn' }
+
+    const createdDamaged = await createSingleArrivalAsset(arrivalNumber, damaged, refs.userId)
+    const createdUndamaged = await createSingleArrivalAsset(arrivalNumber, undamaged, refs.userId)
 
     const assets = await prisma.asset.findMany({
-      where: { arrival: { arrival_number: arrivalNumber } },
-      select: { serial_number: true, is_damaged: true, damage_notes: true },
+      where: { id: { in: [createdDamaged.id, createdUndamaged.id] } },
+      select: { id: true, is_damaged: true, damage_notes: true },
     })
-    // Keyed by serial: the write order of a batched create is not the input order.
-    const bySerial = new Map(assets.map((a) => [a.serial_number, a]))
-    expect(bySerial.get(input.assets[0].serialNumber)).toMatchObject({
+    const byId = new Map(assets.map((a) => [a.id, a]))
+    expect(byId.get(createdDamaged.id)).toMatchObject({
       is_damaged: true,
       damage_notes: 'Dented side panel',
     })
-    expect(bySerial.get(input.assets[1].serialNumber)).toMatchObject({
-      is_damaged: false,
-      damage_notes: null,
-    })
+    expect(byId.get(createdUndamaged.id)).toMatchObject({ is_damaged: false, damage_notes: null })
   })
 
   it('reads the damage back onto the arrival detail rows', async () => {
-    const input = buildCreateArrivalInput(refs, 1)
-    input.assets[0].isDamaged = true
-    input.assets[0].damageNotes = 'Cracked glass'
-    const arrivalNumber = await createArrival(input, refs.userId)
+    const arrivalNumber = await createArrival(buildCreateArrivalInput(refs), refs.userId)
+    const damaged = { ...buildAsset(refs), isDamaged: true, damageNotes: 'Cracked glass' }
+    await createSingleArrivalAsset(arrivalNumber, damaged, refs.userId)
 
     const { assets } = await getArrival(arrivalNumber, ALL_PRICE_PERMISSIONS)
     expect(assets[0]).toMatchObject({ is_damaged: true, damage_notes: 'Cracked glass' })
-  })
-
-  it('barcodes each asset <cityCode>-<7-digit sequence>', async () => {
-    const arrivalNumber = await createArrival(buildCreateArrivalInput(refs, 1), refs.userId)
-    const assets = await prisma.asset.findMany({
-      where: { arrival: { arrival_number: arrivalNumber } },
-      select: { barcode: true },
-    })
-    expect(assets).toHaveLength(1)
-    expect(assets[0].barcode).toMatch(/^YYZ-\d{7}$/)
   })
 })
 
@@ -149,8 +152,8 @@ describe('moveAssetsToArrival', () => {
   })
 
   it('reassigns moved assets to the destination and leaves the rest on the source', async () => {
-    const source = await createArrival(buildCreateArrivalInput(refs, 2), refs.userId)
-    const destination = await createArrival(buildCreateArrivalInput(refs, 1), refs.userId)
+    const source = await createArrivalWithAssets(refs, 2)
+    const destination = await createArrivalWithAssets(refs, 1)
     const [moved, stays] = await getArrivalAssetIds(source)
     const destinationId = await getArrivalId(destination)
     const sourceId = await getArrivalId(source)
@@ -163,8 +166,8 @@ describe('moveAssetsToArrival', () => {
   })
 
   it('records history for the moved assets', async () => {
-    const source = await createArrival(buildCreateArrivalInput(refs, 1), refs.userId)
-    const destination = await createArrival(buildCreateArrivalInput(refs, 1), refs.userId)
+    const source = await createArrivalWithAssets(refs, 1)
+    const destination = await createArrivalWithAssets(refs, 1)
     const [moved] = await getArrivalAssetIds(source)
     const beforeMove = await getMaxHistoryId()
 
@@ -174,7 +177,7 @@ describe('moveAssetsToArrival', () => {
   })
 
   it('rejects moving assets to the same arrival', async () => {
-    const source = await createArrival(buildCreateArrivalInput(refs, 1), refs.userId)
+    const source = await createArrivalWithAssets(refs, 1)
     const [asset] = await getArrivalAssetIds(source)
 
     await expect(moveAssetsToArrival(source, source, [asset], refs.userId)).rejects.toThrow(
@@ -183,8 +186,8 @@ describe('moveAssetsToArrival', () => {
   })
 
   it('rejects moving an asset that is not on the source arrival', async () => {
-    const source = await createArrival(buildCreateArrivalInput(refs, 1), refs.userId)
-    const destination = await createArrival(buildCreateArrivalInput(refs, 1), refs.userId)
+    const source = await createArrivalWithAssets(refs, 1)
+    const destination = await createArrivalWithAssets(refs, 1)
     const [foreign] = await getArrivalAssetIds(destination)
 
     await expect(moveAssetsToArrival(source, destination, [foreign], refs.userId)).rejects.toThrow(
@@ -209,7 +212,7 @@ describe('splitArrival', () => {
   })
 
   it('creates the new arrival from the payload, in the source arrival warehouse', async () => {
-    const source = await createArrival(buildCreateArrivalInput(refs, 2), refs.userId)
+    const source = await createArrivalWithAssets(refs, 2)
     const [moved] = await getArrivalAssetIds(source)
 
     const splitNumber = await splitArrival(source, buildSplitInput([moved]), refs.userId)
@@ -232,7 +235,7 @@ describe('splitArrival', () => {
   })
 
   it('reassigns only the selected assets and leaves the rest on the source', async () => {
-    const source = await createArrival(buildCreateArrivalInput(refs, 3), refs.userId)
+    const source = await createArrivalWithAssets(refs, 3)
     const [moved, stays] = await getArrivalAssetIds(source)
     const sourceId = await getArrivalId(source)
 
@@ -244,7 +247,7 @@ describe('splitArrival', () => {
   })
 
   it('records history for the new arrival and the moved assets', async () => {
-    const source = await createArrival(buildCreateArrivalInput(refs, 2), refs.userId)
+    const source = await createArrivalWithAssets(refs, 2)
     const [moved] = await getArrivalAssetIds(source)
     const beforeSplit = await getMaxHistoryId()
 
@@ -254,7 +257,7 @@ describe('splitArrival', () => {
   })
 
   it('rejects a split that would empty the source arrival', async () => {
-    const source = await createArrival(buildCreateArrivalInput(refs, 2), refs.userId)
+    const source = await createArrivalWithAssets(refs, 2)
     const assetIds = await getArrivalAssetIds(source)
 
     await expect(splitArrival(source, buildSplitInput(assetIds), refs.userId)).rejects.toThrow(
@@ -264,8 +267,8 @@ describe('splitArrival', () => {
   })
 
   it('rejects an asset that is not on the source arrival', async () => {
-    const source = await createArrival(buildCreateArrivalInput(refs, 2), refs.userId)
-    const other = await createArrival(buildCreateArrivalInput(refs, 2), refs.userId)
+    const source = await createArrivalWithAssets(refs, 2)
+    const other = await createArrivalWithAssets(refs, 2)
     const [foreign] = await getArrivalAssetIds(other)
 
     await expect(splitArrival(source, buildSplitInput([foreign]), refs.userId)).rejects.toThrow(
@@ -305,7 +308,7 @@ describe('updateArrivalAsset', () => {
   })
 
   it('records the errors added while editing the asset', async () => {
-    const arrivalNumber = await createArrival(buildCreateArrivalInput(refs), refs.userId)
+    const arrivalNumber = await createArrivalWithAssets(refs, 2)
     const [assetId] = await getArrivalAssetIds(arrivalNumber)
     const errorId = await seedError(refs.brandId, 'E100')
     const editable = await getArrivalAssetForUpdate(arrivalNumber, assetId!)
@@ -339,7 +342,7 @@ describe('getArrival', () => {
   })
 
   it('returns asset cost, redacted by role permissions', async () => {
-    const arrivalNumber = await createArrival(buildCreateArrivalInput(refs, 1), refs.userId)
+    const arrivalNumber = await createArrivalWithAssets(refs, 1)
     const [assetId] = await getArrivalAssetIds(arrivalNumber)
     await seedAssetCost(assetId)
 
@@ -357,14 +360,14 @@ describe('getArrival', () => {
   })
 
   it('returns a null-valued cost for an asset with no cost recorded', async () => {
-    const arrivalNumber = await createArrival(buildCreateArrivalInput(refs, 1), refs.userId)
+    const arrivalNumber = await createArrivalWithAssets(refs, 1)
 
     const arrival = await getArrival(arrivalNumber, ALL_PRICE_PERMISSIONS)
     expect(assetCostOf(arrival.assets[0])).toEqual(REDACTED_ASSET_COST)
   })
 
   it('returns the purchase invoices of its assets with the invoiced vendor', async () => {
-    const arrivalNumber = await createArrival(buildCreateArrivalInput(refs, 3), refs.userId)
+    const arrivalNumber = await createArrivalWithAssets(refs, 3)
     const { assets } = await getArrival(arrivalNumber, ALL_PRICE_PERMISSIONS)
     const [first, second] = assets.map(searchRowToAssetSummary)
     const { invoiceNumber } = await createInvoice(
@@ -402,7 +405,7 @@ describe('deleteArrival', () => {
   })
 
   it('deletes an arrival that holds no assets', async () => {
-    const arrivalNumber = await createArrival(buildCreateArrivalInput(refs, 1), refs.userId)
+    const arrivalNumber = await createArrivalWithAssets(refs, 1)
     const [assetId] = await getArrivalAssetIds(arrivalNumber)
     const asset = await prisma.asset.findUniqueOrThrow({
       where: { id: assetId },
@@ -416,7 +419,7 @@ describe('deleteArrival', () => {
   })
 
   it('refuses to delete an arrival that still holds assets', async () => {
-    const arrivalNumber = await createArrival(buildCreateArrivalInput(refs, 2), refs.userId)
+    const arrivalNumber = await createArrivalWithAssets(refs, 2)
 
     await expect(deleteArrival(arrivalNumber, refs.userId)).rejects.toThrow(
       new ConflictError(`Arrival ${arrivalNumber} cannot be deleted because it still has 2 assets`),

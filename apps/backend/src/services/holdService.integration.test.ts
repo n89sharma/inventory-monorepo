@@ -93,6 +93,21 @@ describe('holdService', () => {
     }
   })
 
+  it('creates an empty hold as active, and keeps it active when its first asset is added', async () => {
+    const holdNumber = await createHold(buildCreateHoldInput(refs, []), refs.userId)
+    expect(await getHoldArchivedAt(holdNumber)).toBeNull()
+
+    const [asset] = await createArrivedAssets(refs, 1)
+    await addRemoveCollectionFromAssetsAndRecord(
+      holdNumber,
+      { assetIdsToAdd: [asset.id], assetIdsToRemove: [] },
+      refs.userId,
+    )
+
+    expect(await getHoldArchivedAt(holdNumber)).toBeNull()
+    expect(await getAssetStatus(asset.id)).toBe(ASSET_STATUS.HELD)
+  })
+
   it('returns an asset to IN_STOCK when removed from a hold', async () => {
     const [asset] = await createArrivedAssets(refs, 1)
     const holdNumber = await createHold(buildCreateHoldInput(refs, [asset]), refs.userId)

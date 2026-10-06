@@ -1,6 +1,7 @@
 import {
   completeDeparture,
   createDeparture,
+  deleteDeparture,
   finishLoadingDeparture,
   getDepartureDetail,
   markDepartureAssetMissingAtLoad,
@@ -16,7 +17,11 @@ import {
   updateDepartureNotes,
 } from '@/data/api/departure-api'
 import { invalidateAssetDetails } from '@/hooks/use-asset-detail'
-import { departureDetailKey, invalidateDepartureLists } from '@/hooks/use-departure'
+import {
+  clearDepartureDetail,
+  departureDetailKey,
+  invalidateDepartureLists,
+} from '@/hooks/use-departure'
 import { invalidateHoldLists } from '@/hooks/use-hold'
 import { invalidateInvoiceLists } from '@/hooks/use-invoice'
 import { invalidateSearchMissing } from '@/hooks/use-search-missing'
@@ -27,7 +32,7 @@ import {
   type PriceSaveSpec,
 } from '@/lib/asset-price-save'
 import { flushPendingRemovals, scheduleBulkAssetRemoval } from '@/lib/asset-removal-undo'
-import type { DepartureForm, DepartureMetadataForm } from '@/ui-types/departure-form-types'
+import type { DepartureMetadataForm } from '@/ui-types/departure-form-types'
 import type {
   AssetIdentity,
   AssetSearchRow,
@@ -37,9 +42,9 @@ import type {
 } from 'shared-types'
 import { mutate } from 'swr'
 
-async function create(data: DepartureForm) {
-  const result = await createDeparture(data)
-  invalidateAssetDetails(data.assets.map((a) => a.barcode))
+async function create(metadata: DepartureMetadataForm, assets: AssetSummary[]) {
+  const result = await createDeparture(metadata, assets)
+  invalidateAssetDetails(assets.map((a) => a.barcode))
   invalidateDepartureLists()
   return result
 }
@@ -221,8 +226,15 @@ function flushPending(departureNumber: string) {
   flushPendingPriceInvalidation(priceSaveSpec(departureNumber))
 }
 
+async function remove(departureNumber: string) {
+  await deleteDeparture(departureNumber)
+  clearDepartureDetail(departureNumber)
+  invalidateDepartureLists()
+}
+
 const mutations = {
   create,
+  remove,
   getAssets,
   addAssets,
   addAsset,

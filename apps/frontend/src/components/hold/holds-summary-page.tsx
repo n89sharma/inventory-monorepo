@@ -12,13 +12,14 @@ import { preloadHoldDetail, useHoldsList } from '@/hooks/use-hold'
 import { collectionDetailHref } from '@/ui-types/navigation-context'
 import { PlusIcon } from '@phosphor-icons/react'
 import { useOptimisticSearchParams } from 'nuqs/adapters/react-router/v7'
-import { useCallback, useMemo } from 'react'
-import { Link } from 'react-router-dom'
+import { useCallback, useMemo, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import type { HoldSummary } from 'shared-types'
 import { Button } from '../shadcn/button'
 import { CollectionPage } from '../collections/collection-page'
 import { SearchBar } from '../shared/search-bar'
 import { SearchSelectOptionFilter } from '../shared/search-select/search-select-option-filter'
+import { CreateHoldModal } from './create-hold-modal'
 
 const CREATED_AT_DESC_SORT = { id: 'created_at', desc: true } as const
 
@@ -83,16 +84,29 @@ export function HoldSummaryPage(): React.JSX.Element {
           />
         </SearchBar>
       }
-      actions={
-        canCreate ? (
-          <Button asChild>
-            <Link to="/holds/new">
-              <PlusIcon />
-              New Hold
-            </Link>
-          </Button>
-        ) : undefined
-      }
+      actions={canCreate ? <NewHoldAction /> : undefined}
     />
+  )
+}
+
+function NewHoldAction(): React.JSX.Element {
+  const [createOpen, setCreateOpen] = useState(false)
+  const navigate = useNavigate()
+  const searchParams = useOptimisticSearchParams()
+
+  return (
+    <>
+      <Button onClick={() => setCreateOpen(true)}>
+        <PlusIcon />
+        New Hold
+      </Button>
+      <CreateHoldModal
+        open={createOpen}
+        onOpenChange={setCreateOpen}
+        onCreated={(holdNumber) =>
+          navigate(collectionDetailHref('holds', holdNumber, searchParams))
+        }
+      />
+    </>
   )
 }

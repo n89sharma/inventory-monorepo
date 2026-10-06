@@ -1,9 +1,14 @@
+import type { DepartureMetadataForm } from '@/ui-types/departure-form-types'
+import type { AssetSummary } from 'shared-types'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const DEPARTURE_NUMBER = 'D-YYZ-0000001'
 const BARCODE = 'YYZ-0000001'
 
 const mocks = vi.hoisted(() => ({
+  createDeparture: vi.fn(),
+  deleteDeparture: vi.fn(),
+  clearDepartureDetail: vi.fn(),
   scheduleDeparture: vi.fn(),
   updateDepartureDate: vi.fn(),
   startLoadingDeparture: vi.fn(),
@@ -21,7 +26,8 @@ const mocks = vi.hoisted(() => ({
 }))
 
 vi.mock('@/data/api/departure-api', () => ({
-  createDeparture: vi.fn(),
+  createDeparture: mocks.createDeparture,
+  deleteDeparture: mocks.deleteDeparture,
   getDepartureDetail: vi.fn(),
   patchDepartureAssets: vi.fn(),
   returnDepartureAssetsToStock: vi.fn(),
@@ -44,6 +50,7 @@ vi.mock('@/hooks/use-asset-detail', () => ({
 
 vi.mock('@/hooks/use-departure', () => ({
   departureDetailKey: (departureNumber: string) => `departure:${departureNumber}`,
+  clearDepartureDetail: mocks.clearDepartureDetail,
   invalidateDepartureLists: mocks.invalidateDepartureLists,
 }))
 
@@ -80,6 +87,29 @@ async function loadMutations() {
 describe('use-departure-mutations invalidation', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+  })
+
+  it('create sends the metadata with the attached assets, then refreshes those assets and the lists', async () => {
+    mocks.createDeparture.mockResolvedValue({ departureNumber: DEPARTURE_NUMBER })
+    const mutations = await loadMutations()
+    const metadata = {} as DepartureMetadataForm
+    const assets = [{ id: 1, barcode: BARCODE }] as AssetSummary[]
+
+    await mutations.create(metadata, assets)
+
+    expect(mocks.createDeparture).toHaveBeenCalledWith(metadata, assets)
+    expect(mocks.invalidateAssetDetails).toHaveBeenCalledWith([BARCODE])
+    expect(mocks.invalidateDepartureLists).toHaveBeenCalledOnce()
+  })
+
+  it('remove deletes the departure, drops its cached detail and refreshes the lists', async () => {
+    const mutations = await loadMutations()
+
+    await mutations.remove(DEPARTURE_NUMBER)
+
+    expect(mocks.deleteDeparture).toHaveBeenCalledWith(DEPARTURE_NUMBER)
+    expect(mocks.clearDepartureDetail).toHaveBeenCalledWith(DEPARTURE_NUMBER)
+    expect(mocks.invalidateDepartureLists).toHaveBeenCalledOnce()
   })
 
   it('schedule invalidates departure detail and lists, not asset details', async () => {

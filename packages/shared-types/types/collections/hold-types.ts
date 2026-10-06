@@ -35,7 +35,7 @@ export const CreateHoldSchema = z.object({
   created_for_id: z.number().int(),
   customer_id: z.number().int(),
   notes: z.string().nullable(),
-  assets: z.array(AssetSummarySchema).nonempty('No assets in the hold').max(2000),
+  assets: z.array(AssetSummarySchema).max(2000),
 })
 export type CreateHold = z.infer<typeof CreateHoldSchema>
 

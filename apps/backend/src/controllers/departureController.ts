@@ -22,6 +22,7 @@ import { prisma } from '../prisma.js'
 import {
   completeDeparture as completeDepartureSer,
   createDeparture as createDepartureSer,
+  deleteDeparture as deleteDepartureSer,
   finishLoadingDeparture as finishLoadingDepartureSer,
   getDeparture as getDepartureSer,
   getDepartureSummaries as getDepartureSummariesSer,
@@ -59,6 +60,11 @@ export const createDeparture = asyncHandler(async (req, res) => {
   const departure = CreateDepartureSchema.parse(req.body)
   const departureNumber = await createDepartureSer(departure, res.locals.dbUserId)
   res.status(201).json({ departureNumber })
+})
+
+export const deleteDeparture = asyncHandler(async (req, res) => {
+  await deleteDepartureSer(req.params.departureNumber, res.locals.dbUserId)
+  res.status(204).send()
 })
 
 export const patchDepartureAssets = asyncHandler(async (req, res) => {

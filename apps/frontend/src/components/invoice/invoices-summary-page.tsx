@@ -26,9 +26,10 @@ import { collectionDetailHref } from '@/ui-types/navigation-context'
 import { PlusIcon } from '@phosphor-icons/react'
 import { useOptimisticSearchParams } from 'nuqs/adapters/react-router/v7'
 import { useCallback, useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import { INVOICE_TYPE, type InvoiceSummary } from 'shared-types'
+import { CreateInvoiceModal } from './create-invoice-modal'
 
 const CSV_MIME_TYPE = 'text/csv'
 
@@ -117,14 +118,7 @@ export function InvoicesSummaryPage(): React.JSX.Element {
             disabled={invoices.length === 0 || exportLoading}
             onClick={handleExport}
           />
-          {canCreate && (
-            <Button asChild>
-              <Link to="/invoices/new">
-                <PlusIcon />
-                New Invoice
-              </Link>
-            </Button>
-          )}
+          {canCreate && <NewInvoiceAction />}
         </div>
       }
     />
@@ -173,5 +167,27 @@ function InvoiceTypeToggle({
     <Button variant="outline" onClick={() => onChange(nextType)}>
       {INVOICE_TYPE_TOGGLE_LABEL[value]}
     </Button>
+  )
+}
+
+function NewInvoiceAction(): React.JSX.Element {
+  const [createOpen, setCreateOpen] = useState(false)
+  const navigate = useNavigate()
+  const searchParams = useOptimisticSearchParams()
+
+  return (
+    <>
+      <Button onClick={() => setCreateOpen(true)}>
+        <PlusIcon />
+        New Invoice
+      </Button>
+      <CreateInvoiceModal
+        open={createOpen}
+        onOpenChange={setCreateOpen}
+        onCreated={(invoiceNumber) =>
+          navigate(collectionDetailHref('invoices', invoiceNumber, searchParams))
+        }
+      />
+    </>
   )
 }

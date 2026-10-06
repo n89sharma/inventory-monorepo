@@ -1,6 +1,6 @@
 import { api } from '@/data/api/axios-client'
 import { toDateParam } from '@/lib/date-param'
-import type { DepartureForm, DepartureMetadataForm } from '@/ui-types/departure-form-types'
+import type { DepartureMetadataForm } from '@/ui-types/departure-form-types'
 import {
   type SelectOption,
   getIdOrNullFromSelection,
@@ -8,11 +8,12 @@ import {
 } from '@/ui-types/select-option-types'
 import type {
   AssetDelta,
+  AssetSummary,
   CollectionHistory,
   CreateDeparture,
+  DepartureAssetId,
   DepartureDetail,
   OrgSummary,
-  DepartureAssetId,
   OutgoingStatus,
   ScheduleDeparture,
   UpdateDepartureDate,
@@ -34,6 +35,7 @@ import {
   UpdateDepartureDateSchema,
   UpdateDepartureMetadataSchema,
   UpdateDepartureNotesSchema,
+  DEFAULT_OUTGOING_STATUS,
 } from 'shared-types'
 import { z } from 'zod'
 
@@ -67,17 +69,17 @@ export async function getDepartureHistory(departureNumber: string): Promise<Coll
   return CollectionHistorySchema.parse(data)
 }
 
-export async function createDeparture(d: DepartureForm): Promise<CreateDepartureResponse> {
+export async function createDeparture(
+  metadata: DepartureMetadataForm,
+  assets: AssetSummary[],
+): Promise<CreateDepartureResponse> {
   const createDepartureBody = CreateDepartureSchema.parse({
-    origin: getSelectedOrNull(d.origin)!,
-    customer: d.customer!,
-    transporter: d.transporter!,
-    salesperson_id: getIdOrNullFromSelection(d.salesperson)!,
-    comment: d.comment,
-    assets: d.assets.map((a) => ({
-      id: a.id,
-      outgoing_status: a.outgoing_status,
-    })) as CreateDeparture['assets'],
+    origin: getSelectedOrNull(metadata.origin)!,
+    customer: metadata.customer!,
+    transporter: metadata.transporter!,
+    salesperson_id: getIdOrNullFromSelection(metadata.salesperson)!,
+    comment: metadata.comment === '' ? null : metadata.comment,
+    assets: assets.map((a) => ({ id: a.id, outgoing_status: DEFAULT_OUTGOING_STATUS })),
   } satisfies CreateDeparture)
   const { data } = await api.post<CreateDepartureResponse>('/departures', createDepartureBody)
   return CreateDepartureResponseSchema.parse(data)
@@ -204,4 +206,8 @@ export async function undoDepartureAssetLoad(
     assetId,
   } satisfies DepartureAssetId)
   await api.post(`/departures/${departureNumber}/assets/undo-load`, undoDepartureAssetLoadBody)
+}
+
+export async function deleteDeparture(departureNumber: string): Promise<void> {
+  await api.delete(`/departures/${departureNumber}`)
 }

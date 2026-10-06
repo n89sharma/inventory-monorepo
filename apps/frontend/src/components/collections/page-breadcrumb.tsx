@@ -10,43 +10,21 @@ import {
 } from '@/components/shadcn/breadcrumb'
 import type { BreadcrumbSegment } from '@/components/shared/breadcrumb-segments'
 
-interface PageBreadcrumbProps {
-  segments: BreadcrumbSegment[]
-  onNavigate?: (href: string) => void
+function BreadcrumbSegmentLabel({ segment }: { segment: BreadcrumbSegment }): React.JSX.Element {
+  if (!segment.href) return <BreadcrumbPage>{segment.label}</BreadcrumbPage>
+  return (
+    <BreadcrumbLink asChild>
+      <Link to={segment.href}>{segment.label}</Link>
+    </BreadcrumbLink>
+  )
 }
 
-interface BreadcrumbBaseProps extends PageBreadcrumbProps {
-  trailingSeparator: boolean
-}
-
-function BreadcrumbBase({
+// Used by detail headers: trailing caret points into the page title below the breadcrumb.
+export function PageBreadcrumbToTitle({
   segments,
-  onNavigate,
-  trailingSeparator,
-}: BreadcrumbBaseProps): React.JSX.Element {
-  function renderLink(href: string, label: string) {
-    if (!onNavigate) {
-      return (
-        <BreadcrumbLink asChild>
-          <Link to={href}>{label}</Link>
-        </BreadcrumbLink>
-      )
-    }
-    return (
-      <BreadcrumbLink asChild>
-        <Link
-          to={href}
-          onClick={(e) => {
-            e.preventDefault()
-            onNavigate(href)
-          }}
-        >
-          {label}
-        </Link>
-      </BreadcrumbLink>
-    )
-  }
-
+}: {
+  segments: BreadcrumbSegment[]
+}): React.JSX.Element {
   return (
     <Breadcrumb>
       <BreadcrumbList>
@@ -54,26 +32,12 @@ function BreadcrumbBase({
           <React.Fragment key={i}>
             {i > 0 ? <BreadcrumbSeparator /> : null}
             <BreadcrumbItem>
-              {seg.href ? (
-                renderLink(seg.href, seg.label)
-              ) : (
-                <BreadcrumbPage>{seg.label}</BreadcrumbPage>
-              )}
+              <BreadcrumbSegmentLabel segment={seg} />
             </BreadcrumbItem>
           </React.Fragment>
         ))}
-        {trailingSeparator ? <BreadcrumbSeparator /> : null}
+        <BreadcrumbSeparator />
       </BreadcrumbList>
     </Breadcrumb>
   )
-}
-
-// Used by edit/create headers: the final segment is the current page, fully shown.
-export function PageBreadcrumb(props: PageBreadcrumbProps): React.JSX.Element {
-  return <BreadcrumbBase {...props} trailingSeparator={false} />
-}
-
-// Used by detail headers: trailing caret points into the page title below the breadcrumb.
-export function PageBreadcrumbToTitle(props: PageBreadcrumbProps): React.JSX.Element {
-  return <BreadcrumbBase {...props} trailingSeparator={true} />
 }

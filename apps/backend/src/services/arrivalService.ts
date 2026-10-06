@@ -155,51 +155,20 @@ function mapDbAssetToUpdateAsset(dbAsset: UpdateArrivalAssetDb, model: ModelSumm
 }
 
 export async function createArrival(newArrival: CreateArrival, userId: number) {
-  const warehouseCode = newArrival.warehouse.city_code
   const currentDateTime = new Date()
-  const barcodes = await generateBarcodes(newArrival.assets, warehouseCode)
-  const arrivalNumber = await getNewArrivalNumber(warehouseCode)
-  const brandIdByModelId = await resolveModelBrands(newArrival.assets.map((a) => a.model.id))
+  const arrivalNumber = await getNewArrivalNumber(newArrival.warehouse.city_code)
 
-  const arrival = await prisma.$transaction(async (tx) => {
-    await validateErrorBrands(tx, buildErrorBrandPairs(newArrival.assets, brandIdByModelId))
-    await validateComponentBrands(tx, buildComponentBrandPairs(newArrival.assets, brandIdByModelId))
-    await assertSerialDuplicatesAllowed(tx, newArrival.assets.map(toSerialCandidate))
-    const locationId = await ensureArrivalLocationId(tx, newArrival.warehouse.id)
-    return tx.arrival.create({
-      data: {
-        arrival_number: arrivalNumber,
-        origin: { connect: { id: newArrival.vendor.id } },
-        destination: { connect: { id: newArrival.warehouse.id } },
-        transporter: { connect: { id: newArrival.transporter.id } },
-        notes: newArrival.comment,
-        created_at: currentDateTime,
-        created_by: { connect: { id: userId } },
-        assets: {
-          create: newArrival.assets.map((a, index) =>
-            mapInputAssetToPrismaCreateAsset(
-              a,
-              barcodes[index],
-              locationId,
-              currentDateTime,
-              userId,
-            ),
-          ),
-        },
-      },
-      include: {
-        assets: {
-          select: {
-            id: true,
-            barcode: true,
-            serial_number: true,
-            model_id: true,
-            status_id: true,
-            readiness_id: true,
-          },
-        },
-      },
-    })
+  const arrival = await prisma.arrival.create({
+    data: {
+      arrival_number: arrivalNumber,
+      origin: { connect: { id: newArrival.vendor.id } },
+      destination: { connect: { id: newArrival.warehouse.id } },
+      transporter: { connect: { id: newArrival.transporter.id } },
+      notes: newArrival.comment,
+      created_at: currentDateTime,
+      created_by: { connect: { id: userId } },
+    },
+    select: { id: true, arrival_number: true },
   })
 
   await recordArrivalCreate(
@@ -210,25 +179,6 @@ export async function createArrival(newArrival: CreateArrival, userId: number) {
       destination_id: newArrival.warehouse.id,
       created_at: currentDateTime,
     },
-    userId,
-  )
-
-  await recordBatchAssetCreate(
-    arrival.assets.map((a) => ({
-      id: a.id,
-      barcode: a.barcode,
-      serial_number: a.serial_number,
-      model_id: a.model_id,
-      arrival_id: arrival.id,
-    })),
-    userId,
-  )
-
-  await recordAssetUpdateOnCollection(
-    'Arrival',
-    arrival.id,
-    arrival.assets.map((a) => a.id),
-    [],
     userId,
   )
 
@@ -785,16 +735,6 @@ export async function createSingleArrivalAsset(
   const [summary] = await prisma.$queryRawTyped(getAssetByBarcode(created.barcode))
   if (!summary) throw new NotFoundError(`Asset ${created.barcode} not found after create`)
   return mapAssetSummary(summary)
-}
-
-// One barcode per asset, positionally. Keying by serial number would collapse two assets that
-// deliberately share one onto a single barcode.
-async function generateBarcodes(assets: CreateAsset[], warehouseCode: string): Promise<string[]> {
-  const barcodes: string[] = []
-  for (let i = 0; i < assets.length; i += 1) {
-    barcodes.push(await getNewAssetBarcode(warehouseCode))
-  }
-  return barcodes
 }
 
 export async function deleteArrival(arrivalNumber: string, userId: number): Promise<void> {

@@ -26,7 +26,15 @@ export function DepartureLifecycleActions({
   if (!canCreateEditDeparture) return null
 
   if (status === DEPARTURE_STATUS.DRAFT) {
-    return <ScheduleDepartureModal onSchedule={onSchedule} />
+    const disabled = assetCount === 0
+    const emptyLabel = disabled ? ' (no assets)' : ''
+    return (
+      <ScheduleDepartureModal
+        label={`Schedule${emptyLabel}`}
+        disabled={disabled}
+        onSchedule={onSchedule}
+      />
+    )
   }
 
   if (status === DEPARTURE_STATUS.SCHEDULED) {

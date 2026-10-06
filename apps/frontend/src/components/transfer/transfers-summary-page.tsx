@@ -14,9 +14,10 @@ import { preloadTransferDetail, useTransfersList } from '@/hooks/use-transfer'
 import { collectionDetailHref } from '@/ui-types/navigation-context'
 import { PlusIcon } from '@phosphor-icons/react'
 import { useOptimisticSearchParams } from 'nuqs/adapters/react-router/v7'
-import { useCallback, useMemo } from 'react'
-import { Link } from 'react-router-dom'
+import { useCallback, useMemo, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import type { TransferSummary } from 'shared-types'
+import { CreateTransferModal } from './create-transfer-modal'
 
 const TRANSFER_DATE_DESC_SORT = { id: 'transfer_date', desc: true } as const
 
@@ -69,16 +70,29 @@ export function TransferSummaryPage(): React.JSX.Element {
           />
         </SearchBar>
       }
-      actions={
-        canCreate ? (
-          <Button asChild>
-            <Link to="/transfers/new">
-              <PlusIcon />
-              New Transfer
-            </Link>
-          </Button>
-        ) : undefined
-      }
+      actions={canCreate ? <NewTransferAction /> : undefined}
     />
+  )
+}
+
+function NewTransferAction(): React.JSX.Element {
+  const [createOpen, setCreateOpen] = useState(false)
+  const navigate = useNavigate()
+  const searchParams = useOptimisticSearchParams()
+
+  return (
+    <>
+      <Button onClick={() => setCreateOpen(true)}>
+        <PlusIcon />
+        New Transfer
+      </Button>
+      <CreateTransferModal
+        open={createOpen}
+        onOpenChange={setCreateOpen}
+        onCreated={(transferNumber) =>
+          navigate(collectionDetailHref('transfers', transferNumber, searchParams))
+        }
+      />
+    </>
   )
 }

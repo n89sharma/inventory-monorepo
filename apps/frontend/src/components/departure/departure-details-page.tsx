@@ -26,6 +26,7 @@ import { getDepartureHistory } from '@/data/api/departure-api'
 import { departureDetailKey, useDepartureDetail } from '@/hooks/use-departure'
 import { useDepartureMutations } from '@/hooks/use-departure-mutations'
 import { useCan } from '@/hooks/use-can'
+import { useEntityDelete } from '@/hooks/use-entity-delete'
 import { usePriceCellEditing } from '@/hooks/use-price-cell-editing'
 import { formatDate } from '@/lib/formatters'
 import { parseISO } from 'date-fns'
@@ -116,6 +117,12 @@ export function DepartureDetailsPage(): React.JSX.Element {
   )
   const { priceEditorRegistry, tableMeta } = usePriceCellEditing(savePrice)
   const [addFromHoldOpen, setAddFromHoldOpen] = useState(false)
+  const handleDelete = useEntityDelete(
+    'Departure',
+    departureNumber,
+    departureNumber,
+    mutations.remove,
+  )
 
   const buildColumns = useCallback(
     (assetHref: (asset: AssetSearchRow) => string, assetWarningOf: AssetWarningOf) =>
@@ -161,6 +168,7 @@ export function DepartureDetailsPage(): React.JSX.Element {
         canEditAssets ? (assets) => mutations.bulkRemoveAssets(departureNumber, assets) : undefined
       }
       onFlushPending={mutations.flushPending}
+      onDelete={handleDelete}
       renderHeaderActions={(departure) => (
         <DepartureLifecycleActions
           status={departure.status}
@@ -196,7 +204,6 @@ export function DepartureDetailsPage(): React.JSX.Element {
             open={addFromHoldOpen}
             onOpenChange={setAddFromHoldOpen}
             getAssets={() => departure.assets}
-            onAddAsset={() => {}}
             onCommitBatch={(assets) => mutations.addAssetBatch(departureNumber, assets)}
           />
         ),

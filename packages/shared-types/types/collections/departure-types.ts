@@ -92,7 +92,7 @@ export const CreateDepartureSchema = z.object({
   transporter: OrgSummarySchema,
   salesperson_id: z.number().int(),
   comment: z.string().nullable(),
-  assets: z.array(DepartureAssetInputSchema).nonempty('No assets in the departure').max(2000),
+  assets: z.array(DepartureAssetInputSchema).max(2000),
 })
 export type CreateDeparture = z.infer<typeof CreateDepartureSchema>
 

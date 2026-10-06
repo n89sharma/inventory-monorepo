@@ -1,6 +1,6 @@
 import { api } from '@/data/api/axios-client'
 import { toDateParam } from '@/lib/date-param'
-import type { HoldForm, HoldMetadataForm } from '@/ui-types/hold-form-types'
+import type { HoldMetadataForm } from '@/ui-types/hold-form-types'
 import {
   getIdOrNullFromSelection,
   getSelectedOrNull,
@@ -8,6 +8,7 @@ import {
 } from '@/ui-types/select-option-types'
 import type {
   AssetDelta,
+  AssetSummary,
   CollectionHistory,
   CreateHold,
   HoldDetail,
@@ -50,12 +51,15 @@ export async function getHolds(
   return z.array(HoldSummarySchema).parse(data)
 }
 
-export async function createHold(d: HoldForm): Promise<CreateHoldResponse> {
+export async function createHold(
+  metadata: HoldMetadataForm,
+  assets: AssetSummary[],
+): Promise<CreateHoldResponse> {
   const createHoldBody = CreateHoldSchema.parse({
-    created_for_id: getIdOrNullFromSelection(d.created_for)!,
-    customer_id: d.customer!.id,
-    notes: d.notes || null,
-    assets: d.assets as CreateHold['assets'],
+    created_for_id: getIdOrNullFromSelection(metadata.created_for)!,
+    customer_id: metadata.customer!.id,
+    notes: metadata.notes || null,
+    assets,
   } satisfies CreateHold)
   const { data } = await api.post<CreateHoldResponse>('/holds', createHoldBody)
   return CreateHoldResponseSchema.parse(data)

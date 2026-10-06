@@ -11,18 +11,19 @@ import {
 } from '@/data/api/arrival-api'
 import { invalidateAssetDetails } from '@/hooks/use-asset-detail'
 import { arrivalDetailKey, clearArrivalDetail, invalidateArrivalLists } from '@/hooks/use-arrival'
+import { invalidateSerialNumberChecks } from '@/hooks/use-serial-number-check'
 import {
   flushPendingPriceInvalidation,
   saveAssetPrice,
   type PriceSaveSpec,
 } from '@/lib/asset-price-save'
 import { flushPendingRemovals, scheduleBulkAssetRemoval } from '@/lib/asset-removal-undo'
-import type { ArrivalForm, ArrivalMetadataForm, AssetForm } from '@/ui-types/arrival-form-types'
+import type { ArrivalMetadataForm, AssetForm } from '@/ui-types/arrival-form-types'
 import type { AssetIdentity, Component, PatchAssetPricing, SplitArrival } from 'shared-types'
 import { mutate } from 'swr'
 
-async function create(data: ArrivalForm) {
-  const result = await createArrival(data)
+async function create(metadata: ArrivalMetadataForm) {
+  const result = await createArrival(metadata)
   invalidateArrivalLists()
   return result
 }
@@ -37,6 +38,7 @@ async function createAsset(arrivalNumber: string, asset: AssetForm) {
   const cacheKey = arrivalDetailKey(arrivalNumber)
   const created = await createSingleArrivalAsset(arrivalNumber, asset)
   invalidateAssetDetails([created.barcode])
+  invalidateSerialNumberChecks()
   invalidateArrivalLists()
   mutate(cacheKey)
   return created
@@ -54,6 +56,7 @@ async function updateAsset(arrivalNumber: string, assetId: number, asset: AssetF
   const cacheKey = arrivalDetailKey(arrivalNumber)
   const updated = await updateArrivalAsset(arrivalNumber, assetId, asset)
   invalidateAssetDetails([updated.barcode])
+  invalidateSerialNumberChecks()
   mutate(cacheKey)
 }
 

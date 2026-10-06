@@ -123,8 +123,6 @@ export const AssetFormSchema = z
     ...specFieldsShape,
     errors: z.array(UpdateErrorSchema),
     comment: z.string().max(2000).nullable(),
-    // Travels with the row into the arrival's asset list so a duplicate confirmed while
-    // composing is still acknowledged when the whole arrival is submitted.
     duplicateSerialAcknowledged: z.boolean(),
   })
   .superRefine((val, ctx) => {
@@ -161,16 +159,6 @@ export const SpecsFormSchema = z
     const visibility = getSpecificationFieldVisibility(val.model?.asset_type ?? null)
     refineSpecFields(val, visibility, val.model?.is_colour ?? false, ctx)
   })
-
-// Arrival Form Page within Edit or Create Arrival
-export const ArrivalFormSchema = z.object({
-  id: z.number().optional(),
-  vendor: OrgSummarySchema.nullable().refine((val) => !!val, 'Vendor required'),
-  transporter: OrgSummarySchema.nullable().refine((val) => !!val, 'Transporter required'),
-  warehouse: WarehouseSelectOptionSchema.refine((val) => isSelected(val), 'Warehouse required'),
-  comment: z.string(),
-  assets: z.array(AssetFormSchema).nonempty('No assets in the arrival'),
-})
 
 export type AssetForm = {
   id?: number
@@ -220,15 +208,6 @@ export type SpecsForm = {
   tonerLifeK: number | null
   isDamaged: boolean
   damageNotes: string | null
-}
-
-export type ArrivalForm = {
-  id?: number
-  vendor: OrgSummary | null
-  transporter: OrgSummary | null
-  warehouse: SelectOption<Warehouse>
-  comment: string
-  assets: AssetForm[]
 }
 
 export const ArrivalMetadataFormSchema = z.object({

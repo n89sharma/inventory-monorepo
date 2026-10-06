@@ -17,15 +17,21 @@ import {
 } from '../shadcn/dropdown-menu'
 import { AddToCollectionModal } from './add-to-collection-modal'
 import { BulkActionBar } from './bulk-action-bar'
+import { CreateDepartureModal } from '../departure/create-departure-modal'
+import { CreateHoldModal } from '../hold/create-hold-modal'
+import { CreateInvoiceModal } from '../invoice/create-invoice-modal'
+import { CreateTransferModal } from '../transfer/create-transfer-modal'
 
 type CollectionType = 'transfers' | 'departures' | 'holds' | 'invoices' | 'arrivals'
 
 const NEW_COLLECTION_OPTIONS = [
-  { collectionType: 'transfers', label: 'Transfer', route: '/transfers/new' },
-  { collectionType: 'departures', label: 'Departure', route: '/departures/new' },
-  { collectionType: 'holds', label: 'Hold', route: '/holds/new' },
-  { collectionType: 'invoices', label: 'Invoice', route: '/invoices/new' },
-] as const satisfies readonly { collectionType: CollectionType; label: string; route: string }[]
+  { collectionType: 'transfers', label: 'Transfer' },
+  { collectionType: 'departures', label: 'Departure' },
+  { collectionType: 'holds', label: 'Hold' },
+  { collectionType: 'invoices', label: 'Invoice' },
+] as const satisfies readonly { collectionType: CollectionType; label: string }[]
+
+type NewCollectionType = (typeof NEW_COLLECTION_OPTIONS)[number]['collectionType']
 
 const EXISTING_COLLECTION_LABEL = 'Existing collection…'
 const NEW_COLLECTION_HEADING = 'New'
@@ -88,7 +94,6 @@ type BulkEditBarProps = {
   onPriceSaveSuccess?: () => void
   refreshKey?: string
   currentCollectionType?: CollectionType
-  returnTo?: string
   invoicePrefill?: InvoicePrefill
   totalCount?: number
   hiddenCount?: number
@@ -104,7 +109,6 @@ export function BulkEditBar({
   onPriceSaveSuccess,
   refreshKey,
   currentCollectionType,
-  returnTo,
   invoicePrefill,
   totalCount,
   hiddenCount,
@@ -116,6 +120,7 @@ export function BulkEditBar({
   const navigate = useNavigate()
   const [addToOpen, setAddToOpen] = useState(false)
   const [bulkPricingOpen, setBulkPricingOpen] = useState(false)
+  const [createTarget, setCreateTarget] = useState<NewCollectionType | null>(null)
   const [assets, setAssets] = useState<AssetSummary[]>([])
 
   const canCreateTransfer = useCan('create_update_transfer')
@@ -167,8 +172,18 @@ export function BulkEditBar({
     setBulkPricingOpen(true)
   }
 
-  function createNewCollection(route: string) {
-    navigate(route, { state: { preloadedAssets: selectedAssets, returnTo, invoicePrefill } })
+  function openCreate(collectionType: NewCollectionType) {
+    setAssets(selectedAssets)
+    setCreateTarget(collectionType)
+  }
+
+  function closeCreate(open: boolean) {
+    if (!open) setCreateTarget(null)
+  }
+
+  function handleCreated(collectionType: NewCollectionType, collectionNumber: string) {
+    onClear()
+    navigate(`/${collectionType}/${collectionNumber}`)
   }
 
   return (
@@ -202,7 +217,7 @@ export function BulkEditBar({
                   {newCollectionOptions.map((option) => (
                     <DropdownMenuItem
                       key={option.collectionType}
-                      onSelect={() => createNewCollection(option.route)}
+                      onSelect={() => openCreate(option.collectionType)}
                     >
                       {option.label}
                     </DropdownMenuItem>
@@ -267,6 +282,39 @@ export function BulkEditBar({
             onClear()
             onPriceSaveSuccess?.()
           }}
+        />
+      )}
+      {createTarget === 'transfers' && (
+        <CreateTransferModal
+          open
+          onOpenChange={closeCreate}
+          assets={assets}
+          onCreated={(transferNumber) => handleCreated('transfers', transferNumber)}
+        />
+      )}
+      {createTarget === 'departures' && (
+        <CreateDepartureModal
+          open
+          onOpenChange={closeCreate}
+          assets={assets}
+          onCreated={(departureNumber) => handleCreated('departures', departureNumber)}
+        />
+      )}
+      {createTarget === 'holds' && (
+        <CreateHoldModal
+          open
+          onOpenChange={closeCreate}
+          assets={assets}
+          onCreated={(holdNumber) => handleCreated('holds', holdNumber)}
+        />
+      )}
+      {createTarget === 'invoices' && (
+        <CreateInvoiceModal
+          open
+          onOpenChange={closeCreate}
+          assets={assets}
+          prefill={invoicePrefill}
+          onCreated={(invoiceNumber) => handleCreated('invoices', invoiceNumber)}
         />
       )}
     </>

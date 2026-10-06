@@ -20,7 +20,13 @@ import {
   SEEDED_ASSET_COST,
   seedShippingAndReceivingLocation,
 } from '../../test/factories.js'
-import { ASSET_STATUS, OUTGOING_STATUS, type LocationParts, type TransferCosts } from 'shared-types'
+import {
+  ASSET_STATUS,
+  OUTGOING_STATUS,
+  TRANSFER_STATUS,
+  type LocationParts,
+  type TransferCosts,
+} from 'shared-types'
 import { ConflictError, NotFoundError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
 import {
@@ -1727,17 +1733,18 @@ describe('deleteTransfer', () => {
     await cleanupTransactionalData()
   })
 
+  it('creates an empty draft transfer', async () => {
+    const transferNumber = await createTransfer(buildCreateTransferInput(refs, []), refs.userId)
+
+    const transfer = await prisma.transfer.findUniqueOrThrow({
+      where: { transfer_number: transferNumber },
+      select: { status: true, _count: { select: { asset_transfers: true } } },
+    })
+    expect(transfer).toEqual({ status: TRANSFER_STATUS.DRAFT, _count: { asset_transfers: 0 } })
+  })
+
   it('deletes a draft transfer that holds no assets', async () => {
-    const [asset] = await createArrivedAssets(refs, 1)
-    const transferNumber = await createTransfer(
-      buildCreateTransferInput(refs, [asset]),
-      refs.userId,
-    )
-    await patchTransferAssets(
-      transferNumber,
-      { assetIdsToAdd: [], assetIdsToRemove: [asset.id] },
-      refs.userId,
-    )
+    const transferNumber = await createTransfer(buildCreateTransferInput(refs, []), refs.userId)
 
     await deleteTransfer(transferNumber, refs.userId)
 

@@ -92,15 +92,13 @@ interface AddFromHoldModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   getAssets: () => { id: number; barcode: string }[]
-  onAddAsset: (asset: AssetSummary) => void
-  onCommitBatch?: (assets: AssetSummary[]) => Promise<void>
+  onCommitBatch: (assets: AssetSummary[]) => Promise<void>
 }
 
 export function AddFromHoldModal({
   open,
   onOpenChange,
   getAssets,
-  onAddAsset,
   onCommitBatch,
 }: AddFromHoldModalProps) {
   const holdMutations = useHoldMutations()
@@ -120,11 +118,7 @@ export function AddFromHoldModal({
       const holdAssets = await holdMutations.getAssets(selected.hold_number)
       const currentIds = new Set(getAssets().map((a) => a.id))
       const toAdd = holdAssets.filter((a) => !currentIds.has(a.id)).map(searchRowToAssetSummary)
-      if (onCommitBatch) {
-        if (toAdd.length > 0) await onCommitBatch(toAdd)
-      } else {
-        toAdd.forEach((asset) => onAddAsset(asset))
-      }
+      if (toAdd.length > 0) await onCommitBatch(toAdd)
       const skipped = holdAssets.length - toAdd.length
       toast.success(
         <HoldAssetsAddedMessage

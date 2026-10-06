@@ -1,11 +1,13 @@
 import { ScheduleDateModal } from '@/components/shared/schedule-date-modal'
 
 interface ScheduleDepartureModalProps {
-  disabled?: boolean
+  label: string
+  disabled: boolean
   onSchedule: (departureDate: string) => Promise<void>
 }
 
 export function ScheduleDepartureModal({
+  label,
   disabled,
   onSchedule,
 }: ScheduleDepartureModalProps): React.JSX.Element {
@@ -14,6 +16,7 @@ export function ScheduleDepartureModal({
       title="Schedule this departure?"
       description="Lock the departure and queue it for loading"
       dateLabel="Departure Date"
+      triggerLabel={label}
       disabled={disabled}
       onSchedule={onSchedule}
     />

@@ -2,6 +2,7 @@ import { useUnsavedChangesGuard } from '@/hooks/use-unsaved-changes-guard'
 import { formatTitleCase } from '@/lib/formatters'
 import { flattenFieldErrors } from '@/lib/utils'
 import { InvoiceMetadataFormSchema, type InvoiceMetadataForm } from '@/ui-types/invoice-form-types'
+import { getSelectOption } from '@/ui-types/select-option-types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { parseISO } from 'date-fns'
 import { useMemo, useState } from 'react'
@@ -126,6 +127,7 @@ function toFormValues(i: InvoiceDetail): InvoiceMetadataForm {
       account_number: i.customer.account_number,
       name: i.customer.name,
     },
+    invoice_type: getSelectOption(i.invoice_type),
     is_cleared: i.is_cleared,
     comment: i.notes ?? '',
   }

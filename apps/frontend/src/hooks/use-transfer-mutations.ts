@@ -31,7 +31,7 @@ import {
   type PriceSaveSpec,
 } from '@/lib/asset-price-save'
 import { flushPendingRemovals, scheduleBulkAssetRemoval } from '@/lib/asset-removal-undo'
-import type { TransferForm, TransferMetadataForm } from '@/ui-types/transfer-form-types'
+import type { TransferMetadataForm } from '@/ui-types/transfer-form-types'
 import type {
   AssetIdentity,
   AssetSearchRow,
@@ -41,9 +41,9 @@ import type {
 } from 'shared-types'
 import { mutate } from 'swr'
 
-async function create(data: TransferForm) {
-  const result = await createTransfer(data)
-  invalidateAssetDetails(data.assets.map((a) => a.barcode))
+async function create(metadata: TransferMetadataForm, assets: AssetSummary[]) {
+  const result = await createTransfer(metadata, assets)
+  invalidateAssetDetails(assets.map((a) => a.barcode))
   invalidateTransferLists()
   return result
 }

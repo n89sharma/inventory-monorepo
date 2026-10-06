@@ -11,11 +11,11 @@ vi.mock('@/hooks/use-can', () => ({
 
 const NOOP_ASYNC = async () => {}
 
-function renderActions(status: string, pendingLoadCount = 0) {
+function renderActions(status: string, pendingLoadCount = 0, assetCount = 3) {
   return render(
     <DepartureLifecycleActions
       status={status}
-      assetCount={3}
+      assetCount={assetCount}
       pendingLoadCount={pendingLoadCount}
       onSchedule={NOOP_ASYNC}
       onStartLoading={NOOP_ASYNC}
@@ -29,7 +29,13 @@ describe('DepartureLifecycleActions', () => {
   it('renders Schedule for a Draft departure', () => {
     mocks.allowed = true
     renderActions(DEPARTURE_STATUS.DRAFT)
-    expect(screen.getByRole('button', { name: 'Schedule' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Schedule' })).toBeEnabled()
+  })
+
+  it('disables Schedule for a Draft departure with no assets', () => {
+    mocks.allowed = true
+    renderActions(DEPARTURE_STATUS.DRAFT, 0, 0)
+    expect(screen.getByRole('button', { name: 'Schedule (no assets)' })).toBeDisabled()
   })
 
   it('renders Start Loading for a Scheduled departure', () => {

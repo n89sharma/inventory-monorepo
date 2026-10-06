@@ -101,7 +101,6 @@ const UNTESTED_DISPLAY = 'Untested'
 const HAS_ERRORS_DISPLAY = 'Has errors'
 const CREATED_ASSET = { id: 10, barcode: 'BC-10' } as AssetSummary
 const SERIAL = 'SN-FIRST'
-const PUNCTUATED_SERIAL = 'sn first'
 const OTHER_SERIAL = 'SN-SECOND'
 const DUPLICATE_BARCODE = 'YYZ-0000042'
 
@@ -187,7 +186,10 @@ function renderModal(
         <CreateAssetModal
           open={open}
           onOpenChange={onOpenChange}
+          editingAsset={null}
+          persistedAsset={null}
           onCreateAsset={onCreateAsset as never}
+          onUpdateAsset={vi.fn()}
           {...extraProps}
         />
       </SWRConfig>
@@ -231,9 +233,9 @@ function addOpenError() {
 describe('CreateAssetModal', () => {
   beforeEach(seedStores)
 
-  it('opens blank again after an asset is created', async () => {
+  it('stays open and blank for the next asset after one is created, and prints its barcode', async () => {
     const onCreateAsset = vi.fn().mockResolvedValue(CREATED_ASSET)
-    const { onOpenChange, reopen } = renderModal(onCreateAsset)
+    const { onOpenChange } = renderModal(onCreateAsset)
 
     pickModel()
     fireEvent.change(serialInput(), { target: { value: SERIAL } })
@@ -241,12 +243,10 @@ describe('CreateAssetModal', () => {
 
     await waitFor(() => expect(onCreateAsset).toHaveBeenCalledOnce())
     expect(onCreateAsset.mock.calls[0][0]).toMatchObject({ serialNumber: SERIAL, model: MODEL })
-    await waitFor(() => expect(onOpenChange).toHaveBeenCalledWith(false))
-
-    reopen()
-
-    expect(serialInput()).toHaveValue('')
+    await waitFor(() => expect(serialInput()).toHaveValue(''))
     expect(screen.queryByText(MODEL_LABEL)).not.toBeInTheDocument()
+    expect(onOpenChange).not.toHaveBeenCalled()
+    expect(useAssetStore.getState().printBarcodes).toHaveBeenCalledWith([CREATED_ASSET.barcode])
   })
 
   it('opens blank again after the edits are discarded', async () => {
@@ -255,7 +255,7 @@ describe('CreateAssetModal', () => {
 
     pickModel()
     fireEvent.change(serialInput(), { target: { value: SERIAL } })
-    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Done' }))
     fireEvent.click(await screen.findByRole('button', { name: 'Discard' }))
 
     await waitFor(() => expect(onOpenChange).toHaveBeenCalledWith(false))
@@ -367,48 +367,6 @@ function confirmDuplicate() {
 
 describe('CreateAssetModal duplicate serial numbers', () => {
   beforeEach(seedStores)
-
-  it('warns when the serial is already on a draft asset, ignoring punctuation', async () => {
-    renderModal(vi.fn().mockResolvedValue(CREATED_ASSET), {
-      draftSerialNumbers: [SERIAL],
-    })
-
-    pickModel()
-    enterSerial(PUNCTUATED_SERIAL)
-
-    expect(
-      await screen.findByText('This serial number is already on an asset in this arrival.'),
-    ).toBeVisible()
-  })
-
-  // A serial can collide with both an unsaved sibling and a persisted asset; neither warning
-  // suppresses the other.
-  it('warns about a draft and a persisted collision together', async () => {
-    getSerialNumberMatches.mockResolvedValue(SOLD_RESULT)
-    renderModal(vi.fn().mockResolvedValue(CREATED_ASSET), { draftSerialNumbers: [SERIAL] })
-
-    pickModel()
-    enterSerial(SERIAL)
-
-    expect(
-      await screen.findByText('This serial number is already on an asset in this arrival.'),
-    ).toBeVisible()
-    expect(await screen.findByRole('link', { name: DUPLICATE_BARCODE })).toBeVisible()
-  })
-
-  // Both rows of an arrival are created IN_STOCK, so an unsaved sibling is the forbidden case
-  // arriving a moment early — there is nothing to acknowledge.
-  it('blocks the save on a draft collision', async () => {
-    const onCreateAsset = vi.fn().mockResolvedValue(CREATED_ASSET)
-    renderModal(onCreateAsset, { draftSerialNumbers: [SERIAL] })
-
-    pickModel()
-    enterSerial(SERIAL)
-    await screen.findByText('This serial number is already on an asset in this arrival.')
-
-    await waitFor(() => expect(saveButton()).toBeDisabled(), { timeout: CHECK_TIMEOUT_MS })
-    expect(onCreateAsset).not.toHaveBeenCalled()
-  })
 
   it('blocks the save when the serial is held by an asset that was not sold on', async () => {
     getSerialNumberMatches.mockResolvedValue(BLOCKED_RESULT)

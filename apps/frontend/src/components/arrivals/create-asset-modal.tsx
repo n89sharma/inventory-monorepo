@@ -7,17 +7,11 @@ import { DISCARD_USER_EDITS, KEEP_USER_EDITS_ON_SERVER_REFRESH } from '@/lib/for
 import { DuplicateSerialWarning } from '@/components/shared/duplicate-serial-warning'
 import { useSerialNumberCheck, type PersistedAsset } from '@/hooks/use-serial-number-check'
 import { modelLabel } from '@/lib/reference-labels'
-import { AssetFormSchema, type ArrivalForm, type AssetForm } from '@/ui-types/arrival-form-types'
+import { AssetFormSchema, type AssetForm } from '@/ui-types/arrival-form-types'
 import { getSelectOption, isSelected, UNSELECTED } from '@/ui-types/select-option-types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMemo, useState } from 'react'
-import {
-  Controller,
-  useForm,
-  useWatch,
-  type UseFieldArrayAppend,
-  type UseFieldArrayUpdate,
-} from 'react-hook-form'
+import { Controller, useForm, useWatch } from 'react-hook-form'
 import type { AssetSummary, ModelSummary, Status } from 'shared-types'
 import { WarningIcon } from '@phosphor-icons/react'
 import { toast } from 'sonner'
@@ -68,35 +62,23 @@ function getDefaultNewAsset(allReadinesses: Status[] = []): AssetForm {
   }
 }
 
-const NO_DRAFT_SERIAL_NUMBERS: string[] = []
-
 interface CreateAssetModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  addNewAsset?: UseFieldArrayAppend<ArrivalForm, 'assets'>
-  updateAsset?: UseFieldArrayUpdate<ArrivalForm, 'assets'>
-  editingAsset?: AssetForm | null
-  editingIndex?: number | null
-  onCreateAsset?: (asset: AssetForm) => Promise<AssetSummary>
-  onUpdateAsset?: (asset: AssetForm) => Promise<void>
-  // Serial numbers of the other assets already composed into this arrival but not yet saved.
-  draftSerialNumbers?: string[]
-  // Set only when editing an asset that already exists in the database, so an unchanged serial
-  // is neither checked nor gated. A draft row has none: the arrival submit checks it as new.
-  persistedAsset?: PersistedAsset | null
+  editingAsset: AssetForm | null
+  onCreateAsset: (asset: AssetForm) => Promise<AssetSummary>
+  onUpdateAsset: (asset: AssetForm) => Promise<void>
+  // Set only when editing an asset, so an unchanged serial is neither checked nor gated.
+  persistedAsset: PersistedAsset | null
 }
 
 export function CreateAssetModal({
   open,
   onOpenChange,
-  addNewAsset,
-  updateAsset,
   editingAsset,
-  editingIndex,
   onCreateAsset,
   onUpdateAsset,
-  draftSerialNumbers = NO_DRAFT_SERIAL_NUMBERS,
-  persistedAsset = null,
+  persistedAsset,
 }: CreateAssetModalProps): React.JSX.Element {
   const isEditMode = editingAsset != null
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -105,6 +87,7 @@ export function CreateAssetModal({
   const modalConfig = {
     title: isEditMode ? 'Edit Asset' : 'Create Asset',
     submitLabel: isEditMode ? 'Update Asset' : 'Save Asset',
+    dismissLabel: isEditMode ? 'Cancel' : 'Done',
   }
 
   const readinesses = useReadinesses()
@@ -133,7 +116,6 @@ export function CreateAssetModal({
   const serialCheck = useSerialNumberCheck({
     serialNumber: currSerialNumber ?? '',
     persistedAsset,
-    draftSerialNumbers,
   })
   const currReadinessStatus = isSelected(readinessSelection)
     ? readinessSelection.selected.status
@@ -205,7 +187,7 @@ export function CreateAssetModal({
       tonerLifeK: rawAsset.tonerLifeK ?? 0,
       damageNotes: rawAsset.isDamaged ? rawAsset.damageNotes : null,
     }
-    if (isEditMode && onUpdateAsset) {
+    if (isEditMode) {
       setIsSubmitting(true)
       try {
         await onUpdateAsset(asset)
@@ -218,29 +200,17 @@ export function CreateAssetModal({
       }
       return
     }
-    if (isEditMode) {
-      updateAsset!(editingIndex!, asset)
-      newAssetForm.reset(asset, DISCARD_USER_EDITS)
-      closeModal()
-      return
+    setIsSubmitting(true)
+    try {
+      const created = await onCreateAsset(asset)
+      newAssetForm.reset(getDefaultNewAsset(readinesses), DISCARD_USER_EDITS)
+      toast.success(`Asset ${created.barcode} created`, { position: 'top-center' })
+      void printCreatedAssetBarcode(created.barcode)
+    } catch {
+      // interceptor already showed the error toast — keep modal open
+    } finally {
+      setIsSubmitting(false)
     }
-    if (onCreateAsset) {
-      setIsSubmitting(true)
-      try {
-        const created = await onCreateAsset(asset)
-        newAssetForm.reset(getDefaultNewAsset(readinesses), DISCARD_USER_EDITS)
-        closeModal()
-        void printCreatedAssetBarcode(created.barcode)
-      } catch {
-        // interceptor already showed the error toast — keep modal open
-      } finally {
-        setIsSubmitting(false)
-      }
-      return
-    }
-    addNewAsset!(asset)
-    newAssetForm.reset(getDefaultNewAsset(readinesses), DISCARD_USER_EDITS)
-    closeModal()
   }
 
   // Validation runs first, so field errors surface before the duplicate prompt and the prompt
@@ -346,7 +316,7 @@ export function CreateAssetModal({
             type="button"
             disabled={isSubmitting}
           >
-            Cancel
+            {modalConfig.dismissLabel}
           </Button>
           <Button
             onClick={submitAsset}

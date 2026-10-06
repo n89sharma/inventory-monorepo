@@ -1,11 +1,13 @@
 import { ScheduleDateModal } from '@/components/shared/schedule-date-modal'
 
 interface ScheduleTransferModalProps {
-  disabled?: boolean
+  label: string
+  disabled: boolean
   onSchedule: (transferDate: string) => Promise<void>
 }
 
 export function ScheduleTransferModal({
+  label,
   disabled,
   onSchedule,
 }: ScheduleTransferModalProps): React.JSX.Element {
@@ -14,6 +16,7 @@ export function ScheduleTransferModal({
       title="Schedule this transfer?"
       description="Lock the transfer and queues it for loading"
       dateLabel="Transfer Date"
+      triggerLabel={label}
       disabled={disabled}
       onSchedule={onSchedule}
     />

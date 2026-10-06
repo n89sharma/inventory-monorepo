@@ -42,7 +42,6 @@ export const CreateArrivalSchema = z.object({
   transporter: OrgSummarySchema.refine((val) => !!val, 'Transporter required'),
   warehouse: WarehouseSchema.refine((val) => !!val, 'Warehouse required'),
   comment: z.string().nullable(),
-  assets: z.array(CreateAssetSchema).nonempty('No assets in the arrival').max(2000),
 })
 export type CreateArrival = z.infer<typeof CreateArrivalSchema>
 

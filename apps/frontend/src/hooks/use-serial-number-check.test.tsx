@@ -1,9 +1,13 @@
-import { renderHook, waitFor } from '@testing-library/react'
+import { act, renderHook, waitFor } from '@testing-library/react'
 import type { ReactNode } from 'react'
 import type { SerialNumberCheckResult, SerialNumberMatch } from 'shared-types'
 import { SWRConfig } from 'swr'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { useSerialNumberCheck, type PersistedAsset } from './use-serial-number-check'
+import {
+  invalidateSerialNumberChecks,
+  useSerialNumberCheck,
+  type PersistedAsset,
+} from './use-serial-number-check'
 
 const getSerialNumberMatches = vi.hoisted(() => vi.fn())
 vi.mock('@/data/api/asset-api', async (importOriginal) => {
@@ -54,24 +58,21 @@ const SWR_TEST_OPTIONS = {
   revalidateOnFocus: false,
 }
 
+function GlobalCacheSwrWrapper({ children }: { children: ReactNode }) {
+  return <SWRConfig value={{ dedupingInterval: 0, revalidateOnFocus: false }}>{children}</SWRConfig>
+}
+
 function SwrWrapper({ children }: { children: ReactNode }) {
   return <SWRConfig value={SWR_TEST_OPTIONS}>{children}</SWRConfig>
 }
 
 function renderCheck(
   serialNumber: string,
-  {
-    draftSerialNumbers = [],
-    persistedAsset = null,
-  }: { draftSerialNumbers?: string[]; persistedAsset?: PersistedAsset | null } = {},
+  { persistedAsset = null }: { persistedAsset?: PersistedAsset | null } = {},
 ) {
   return renderHook(
     (currSerialNumber: string) =>
-      useSerialNumberCheck({
-        serialNumber: currSerialNumber,
-        persistedAsset,
-        draftSerialNumbers,
-      }),
+      useSerialNumberCheck({ serialNumber: currSerialNumber, persistedAsset }),
     { initialProps: serialNumber, wrapper: SwrWrapper },
   )
 }
@@ -94,20 +95,10 @@ describe('useSerialNumberCheck', () => {
     await expect.poll(() => getSerialNumberMatches.mock.calls.length).toBe(0)
   })
 
-  it('matches a draft serial number regardless of punctuation and case', async () => {
-    const { result } = renderCheck(PUNCTUATED_SERIAL, { draftSerialNumbers: [SERIAL] })
-
-    await waitFor(() => expect(result.current.draftMatch).toBe(true))
-    expect(result.current.hasMatch).toBe(true)
-    // An unsaved sibling is created IN_STOCK, so it can never be acknowledged away.
-    expect(result.current.isBlocked).toBe(true)
-  })
-
   it('reports no match for a serial number nothing else holds', async () => {
-    const { result } = renderCheck(SERIAL, { draftSerialNumbers: [OTHER_SERIAL] })
+    const { result } = renderCheck(SERIAL)
 
     await waitFor(() => expect(getSerialNumberMatches).toHaveBeenCalled())
-    expect(result.current.draftMatch).toBe(false)
     expect(result.current.hasMatch).toBe(false)
     expect(result.current.isBlocked).toBe(false)
   })
@@ -181,6 +172,18 @@ describe('useSerialNumberCheck', () => {
     await waitFor(() => expect(getSerialNumberMatches).toHaveBeenCalledOnce())
 
     rerender(OTHER_SERIAL)
+
+    await waitFor(() => expect(getSerialNumberMatches).toHaveBeenCalledTimes(2))
+  })
+
+  // Uses the app-wide cache, which is the one the invalidator reaches.
+  it('looks the serial number up again once the checks are invalidated', async () => {
+    renderHook(() => useSerialNumberCheck({ serialNumber: SERIAL, persistedAsset: null }), {
+      wrapper: GlobalCacheSwrWrapper,
+    })
+    await waitFor(() => expect(getSerialNumberMatches).toHaveBeenCalledOnce())
+
+    await act(() => invalidateSerialNumberChecks())
 
     await waitFor(() => expect(getSerialNumberMatches).toHaveBeenCalledTimes(2))
   })

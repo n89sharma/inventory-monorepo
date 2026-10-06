@@ -74,7 +74,7 @@ export const CreateTransferSchema = z
     destination: WarehouseSchema.refine((val) => !!val, 'Destination required'),
     transporter: OrgSummarySchema.refine((val) => !!val, 'Transporter required'),
     comment: z.string().nullable(),
-    assets: z.array(AssetSummarySchema).nonempty('No assets in the transfer').max(2000),
+    assets: z.array(AssetSummarySchema).max(2000),
   })
   .refine((data) => data.origin.id !== data.destination.id, {
     message: 'Origin and destination cannot be the same',

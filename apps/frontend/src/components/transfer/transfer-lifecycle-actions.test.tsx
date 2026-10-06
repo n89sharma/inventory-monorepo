@@ -12,14 +12,14 @@ const NOOP_ASYNC = async () => {}
 
 function renderActions(
   status: string,
-  overrides: { pendingLoadCount?: number; pendingUnloadCount?: number } = {},
+  overrides: { assetCount?: number; pendingLoadCount?: number; pendingUnloadCount?: number } = {},
 ) {
   return render(
     <TransferLifecycleActions
       status={status}
       originId={1}
       destinationCode="YYZ"
-      assetCount={3}
+      assetCount={overrides.assetCount ?? 3}
       testedCount={1}
       transferDate={null}
       pendingLoadCount={overrides.pendingLoadCount ?? 0}
@@ -34,9 +34,14 @@ function renderActions(
 }
 
 describe('TransferLifecycleActions', () => {
-  it('renders Schedule for a Draft transfer', () => {
+  it('renders an enabled Schedule for a Draft transfer with assets', () => {
     renderActions(TRANSFER_STATUS.DRAFT)
-    expect(screen.getByRole('button', { name: 'Schedule' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Schedule' })).toBeEnabled()
+  })
+
+  it('disables Schedule for a Draft transfer with no assets', () => {
+    renderActions(TRANSFER_STATUS.DRAFT, { assetCount: 0 })
+    expect(screen.getByRole('button', { name: 'Schedule (no assets)' })).toBeDisabled()
   })
 
   it('renders Start Loading for a Scheduled transfer', () => {

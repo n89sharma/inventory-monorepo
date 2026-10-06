@@ -11,14 +11,15 @@ import {
 import { collectionDetailHref } from '@/ui-types/navigation-context'
 import { PlusIcon } from '@phosphor-icons/react'
 import { useOptimisticSearchParams } from 'nuqs/adapters/react-router/v7'
-import { useCallback, useMemo } from 'react'
-import { Link } from 'react-router-dom'
+import { useCallback, useMemo, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import type { ArrivalSummary } from 'shared-types'
 import { Button } from '../shadcn/button'
 import { CollectionPage } from '../collections/collection-page'
 import { SearchBar } from '../shared/search-bar'
 import { SearchSelectOptionFilter } from '../shared/search-select/search-select-option-filter'
 import { SelectOptionsInline } from '../shared/search-select/select-options'
+import { CreateArrivalModal } from './create-arrival-modal'
 
 const CREATED_AT_DESC_SORT = { id: 'created_at', desc: true } as const
 
@@ -73,16 +74,29 @@ export function ArrivalsSummaryPage(): React.JSX.Element {
           />
         </SearchBar>
       }
-      actions={
-        canCreate ? (
-          <Button asChild>
-            <Link to="/arrivals/new">
-              <PlusIcon />
-              New Arrival
-            </Link>
-          </Button>
-        ) : undefined
-      }
+      actions={canCreate ? <NewArrivalAction /> : undefined}
     />
+  )
+}
+
+function NewArrivalAction(): React.JSX.Element {
+  const [createOpen, setCreateOpen] = useState(false)
+  const navigate = useNavigate()
+  const searchParams = useOptimisticSearchParams()
+
+  return (
+    <>
+      <Button onClick={() => setCreateOpen(true)}>
+        <PlusIcon />
+        New Arrival
+      </Button>
+      <CreateArrivalModal
+        open={createOpen}
+        onOpenChange={setCreateOpen}
+        onCreated={(arrivalNumber) =>
+          navigate(collectionDetailHref('arrivals', arrivalNumber, searchParams))
+        }
+      />
+    </>
   )
 }

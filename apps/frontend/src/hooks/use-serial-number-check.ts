@@ -1,7 +1,7 @@
 import { getSerialNumberMatches } from '@/data/api/asset-api'
 import { useDebouncedValue } from '@/hooks/use-debounced-value'
 import { normalizeForSearch, type SerialNumberMatch } from 'shared-types'
-import useSWR from 'swr'
+import useSWR, { mutate } from 'swr'
 
 const SERIAL_NUMBER_CHECK_KEY = 'serial-number-check'
 
@@ -15,18 +15,17 @@ export interface PersistedAsset {
 }
 
 export interface SerialNumberCheck {
-  draftMatch: boolean
   databaseMatches: SerialNumberMatch[]
   totalDatabaseMatchCount: number
   isChecking: boolean
   hasMatch: boolean
-  // A duplicate no acknowledgment can permit: an unsaved sibling, or a holder that was not sold on.
+  // A duplicate no acknowledgment can permit: a holder that was not sold on.
   isBlocked: boolean
 }
 
 /**
- * Reports whether a serial number already exists — on an unsaved sibling in the collection being
- * composed, or on a persisted asset — and whether that duplicate may be saved at all.
+ * Reports whether a serial number already exists on a persisted asset, and whether that duplicate
+ * may be saved at all.
  *
  * The lookup follows the live field value through a debounce rather than a blur, so `isChecking`
  * covers the whole window in which the answer does not yet describe what is in the field. A caller
@@ -44,11 +43,9 @@ export interface SerialNumberCheck {
 export function useSerialNumberCheck({
   serialNumber,
   persistedAsset,
-  draftSerialNumbers,
 }: {
   serialNumber: string
   persistedAsset: PersistedAsset | null
-  draftSerialNumbers: string[]
 }): SerialNumberCheck {
   const settledSerialNumber = useDebouncedValue(serialNumber, SERIAL_CHECK_DEBOUNCE_MS)
   const normalized = normalizeForSearch(settledSerialNumber)
@@ -63,16 +60,17 @@ export function useSerialNumberCheck({
     { revalidateOnFocus: false, revalidateOnReconnect: false },
   )
 
-  const draftMatch =
-    isLookupNeeded && draftSerialNumbers.some((draft) => normalizeForSearch(draft) === normalized)
   const databaseMatches = data?.matches ?? NO_MATCHES
 
   return {
-    draftMatch,
     databaseMatches,
     totalDatabaseMatchCount: data?.totalMatchCount ?? 0,
     isChecking: settledSerialNumber !== serialNumber || isLoading,
-    hasMatch: draftMatch || databaseMatches.length > 0,
-    isBlocked: draftMatch || (data?.blockingMatchCount ?? 0) > 0,
+    hasMatch: databaseMatches.length > 0,
+    isBlocked: (data?.blockingMatchCount ?? 0) > 0,
   }
+}
+
+export function invalidateSerialNumberChecks() {
+  mutate((key) => Array.isArray(key) && key[0] === SERIAL_NUMBER_CHECK_KEY)
 }

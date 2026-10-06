@@ -19,6 +19,7 @@ vi.mock('@/hooks/use-departure-mutations', () => ({
   useDepartureMutations: () => ({
     updatePrice: vi.fn(),
     flushPending: vi.fn(),
+    remove: vi.fn(),
     bulkRemoveAssets: vi.fn(),
     addAsset: vi.fn(),
     addAssetBatch: vi.fn(),
@@ -53,6 +54,7 @@ vi.mock('@/components/collections/collection-detail-page', () => ({
     renderTabContent: (tabValue: string, entity: unknown) => ReactNode
     renderAddAssetBar: (entity: unknown) => ReactNode
     onBulkRemove?: unknown
+    onDelete?: unknown
     detail: { data: unknown }
   }) => (
     <div data-testid="details-content">
@@ -63,6 +65,7 @@ vi.mock('@/components/collections/collection-detail-page', () => ({
       ))}
       <div data-testid="active-tab">{props.activeTab}</div>
       {props.onBulkRemove !== undefined && <div data-testid="bulk-remove" />}
+      {props.onDelete !== undefined && <div data-testid="delete" />}
       {props.renderAddAssetBar(props.detail.data)}
       {props.tabs
         .filter((tab) => tab.value === props.activeTab)
@@ -170,6 +173,13 @@ describe('DepartureDetailsPage tabs', () => {
 })
 
 describe('DepartureDetailsPage edit affordances', () => {
+  it('offers Delete on a departure', () => {
+    detail.data = makeDetail(DEPARTURE_STATUS.DRAFT)
+    renderPage()
+
+    expect(screen.getByTestId('delete')).toBeInTheDocument()
+  })
+
   it('offers adding and removing assets only while Draft', () => {
     detail.data = makeDetail(DEPARTURE_STATUS.DRAFT)
     const { unmount } = renderPage()

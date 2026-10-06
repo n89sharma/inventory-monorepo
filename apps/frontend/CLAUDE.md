@@ -10,21 +10,21 @@ Root `CLAUDE.md` rules still apply.
 
 ## Layers
 
-| Layer          | Path                                     | Responsibility                                                                                                                                                                                                                 |
-| -------------- | ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Form types     | `ui-types/entity-form-types.ts`          | Zod schema + inferred type for react-hook-form; UI shape (e.g. `SelectOption<User>`)                                                                                                                                           |
-| API            | `data/api/entity-api.ts`                 | Axios calls; maps form payload ↔ request body. No SWR, no cache logic                                                                                                                                                          |
-| Filters        | `lib/filters/*.ts`                       | URL-backed page state on nuqs: `hooks.ts` (one `useXParam` per filter), `parsers.ts`, `serializers.ts`, `defaults.ts`                                                                                                          |
-| Query hooks    | `hooks/use-entity.ts`                    | SWR reads: `useXDetail`, `preloadXDetail`, `xDetailKey`, `useXsList`, `invalidateXLists`. List key returns `null` until `fromDate` is set; `invalidateXLists()` is a matcher revalidating every cached filter variant          |
-| Mutation hooks | `hooks/use-entity-mutations.ts`          | All writes for an entity (`create`, `addAsset`, `removeAsset`, `bulkRemoveAssets`, `updateMetadata`, `flushPending`…); returns a stable object. Imports keys/invalidators from `use-entity.ts` only — no cross-sibling imports |
-| Pages          | `components/entity/entity-form-page.tsx` | Form page holds all field UI; create/details pages are thin wrappers (config + navigation)                                                                                                                                     |
-| Column defs    | `components/entity/entity-columns.tsx`   | TanStack columns, kept out of page components. Asset column builders shared across entities live in `components/table-columns/`                                                                                                |
-| Components     | `components/shared/descriptive-name.tsx` | Reusable UI not tied to one entity                                                                                                                                                                                             |
-| Hooks          | `hooks/use-kebab-case.ts`                | Custom hooks (see below)                                                                                                                                                                                                       |
-| Lib            | `lib/*.ts`                               | Pure utils / cross-cutting helpers                                                                                                                                                                                             |
+| Layer          | Path                                        | Responsibility                                                                                                                                                                                                                 |
+| -------------- | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Form types     | `ui-types/entity-form-types.ts`             | Zod schema + inferred type for react-hook-form; UI shape (e.g. `SelectOption<User>`)                                                                                                                                           |
+| API            | `data/api/entity-api.ts`                    | Axios calls; maps form payload ↔ request body. No SWR, no cache logic                                                                                                                                                          |
+| Filters        | `lib/filters/*.ts`                          | URL-backed page state on nuqs: `hooks.ts` (one `useXParam` per filter), `parsers.ts`, `serializers.ts`, `defaults.ts`                                                                                                          |
+| Query hooks    | `hooks/use-entity.ts`                       | SWR reads: `useXDetail`, `preloadXDetail`, `xDetailKey`, `useXsList`, `invalidateXLists`. List key returns `null` until `fromDate` is set; `invalidateXLists()` is a matcher revalidating every cached filter variant          |
+| Mutation hooks | `hooks/use-entity-mutations.ts`             | All writes for an entity (`create`, `addAsset`, `removeAsset`, `bulkRemoveAssets`, `updateMetadata`, `flushPending`…); returns a stable object. Imports keys/invalidators from `use-entity.ts` only — no cross-sibling imports |
+| Pages          | `components/entity/entity-details-page.tsx` | Details page wires the entity into `CollectionDetailPage`; create is a `create-entity-modal.tsx` on `CreateCollectionModal`, with header fields shared with the edit modal via `entity-metadata-fields.tsx`                    |
+| Column defs    | `components/entity/entity-columns.tsx`      | TanStack columns, kept out of page components. Asset column builders shared across entities live in `components/table-columns/`                                                                                                |
+| Components     | `components/shared/descriptive-name.tsx`    | Reusable UI not tied to one entity                                                                                                                                                                                             |
+| Hooks          | `hooks/use-kebab-case.ts`                   | Custom hooks (see below)                                                                                                                                                                                                       |
+| Lib            | `lib/*.ts`                                  | Pure utils / cross-cutting helpers                                                                                                                                                                                             |
 
 Reading one file per layer for an existing entity (~8 files: form types, API, query hook,
-mutations hook, form page, create page, details page, columns) gives the full end-to-end pattern.
+mutations hook, create modal, metadata fields, details page, columns) gives the full end-to-end pattern.
 Entity directories under `components/` are singular for some entities (`hold/`, `departure/`,
 `transfer/`, `invoice/`, `store-part/`) and plural for others (`arrivals/`, `collections/`) —
 check before assuming.
@@ -98,13 +98,12 @@ prop before the condition), use `?.` inside children, not `!` — ref
   single consumer when the root cause is in `components/shared/`. The exception is layout owned by
   one screen: fix that at the page or wrapper, not on a shared shadcn primitive.
 - **Toasts:** always pass `{ position: 'top-center' }` to every `toast.error/success/warning`.
-- **Form page anatomy:** `FieldSet` + `FieldLegend` + `FieldGroup` wraps all fields; barcode
-  scanner and asset table sit outside the `FieldSet`. Read an existing page (e.g.
-  `components/hold/create-hold-page.tsx`) for the exact shape. Validation errors:
-  `toast.error(flattenFieldErrors(errors, []))` in `onInvalid`. Asset errors: `<Controller
-name='assets'>` renders `<FieldError>` when `fieldState.invalid`.
-- **Routing (`app.tsx`):** specific routes before param routes — `/holds/new` before
-  `/holds/:collectionId`.
+- **Create flow:** a collection is created empty (or with a bulk-bar selection) from its
+  `create-entity-modal.tsx`, then assets are added one at a time on the details page, where the
+  server checks each on add. Read `components/hold/create-hold-modal.tsx` for the exact shape.
+  Validation errors: `toast.error(flattenFieldErrors(errors, []))` in `onInvalid`.
+- **Routing (`app.tsx`):** specific routes before param routes — `/reports/month-end` before
+  `/reports/month-end/:reportId`.
 - **`SelectOption<T>`** (`ui-types/select-option-types.ts`): states `SELECTED { selected: T }` /
   `UNSELECTED` / `ANY`. `SelectOptions` for small fixed lists; for large searchable lists use the
   chip-based `SearchSelectInput` (`components/shared/search-select/search-select-input.tsx`, stores `T | null`,

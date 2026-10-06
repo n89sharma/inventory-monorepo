@@ -14,6 +14,10 @@ export function useDepartureDetail(departureNumber: string) {
   return useSWR(departureDetailKey(departureNumber), () => getDepartureDetail(departureNumber))
 }
 
+export function clearDepartureDetail(departureNumber: string): void {
+  mutate(departureDetailKey(departureNumber), undefined, { revalidate: false })
+}
+
 export function preloadDepartureDetail(departureNumber: string) {
   preload(departureDetailKey(departureNumber), () => getDepartureDetail(departureNumber))
 }

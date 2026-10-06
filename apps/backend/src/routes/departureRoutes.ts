@@ -2,6 +2,7 @@ import express from 'express'
 import {
   completeDeparture,
   createDeparture,
+  deleteDeparture,
   finishLoadingDeparture,
   getDepartureDetail,
   getDepartureHistory,
@@ -35,6 +36,7 @@ router.get(
 router.post('/', requirePermission('create_update_departure'), createDeparture)
 router.get('/:departureNumber/history', requirePermission('view_collections'), getDepartureHistory)
 router.get('/:departureNumber', requirePermission('view_collections'), getDepartureDetail)
+router.delete('/:departureNumber', requirePermission('delete_collection'), deleteDeparture)
 router.patch(
   '/:departureNumber/assets',
   requirePermission('create_update_departure'),

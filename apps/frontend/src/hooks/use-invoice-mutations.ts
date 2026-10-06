@@ -13,13 +13,13 @@ import {
   type PriceSaveSpec,
 } from '@/lib/asset-price-save'
 import { flushPendingRemovals, scheduleBulkAssetRemoval } from '@/lib/asset-removal-undo'
-import type { InvoiceForm, InvoiceMetadataForm } from '@/ui-types/invoice-form-types'
+import type { InvoiceMetadataForm } from '@/ui-types/invoice-form-types'
 import type { AssetIdentity, AssetSearchRow, AssetSummary, PatchAssetPricing } from 'shared-types'
 import { mutate } from 'swr'
 
-async function create(data: InvoiceForm) {
-  const result = await createInvoice(data)
-  invalidateAssetDetails(data.assets.map((a) => a.barcode))
+async function create(metadata: InvoiceMetadataForm, assets: AssetSummary[]) {
+  const result = await createInvoice(metadata, assets)
+  invalidateAssetDetails(assets.map((a) => a.barcode))
   invalidateInvoiceLists()
   return result
 }

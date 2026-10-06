@@ -4,7 +4,7 @@ import { ScheduleTransferModal } from './schedule-transfer-modal'
 
 function renderModal() {
   const onSchedule = vi.fn().mockResolvedValue(undefined)
-  render(<ScheduleTransferModal onSchedule={onSchedule} />)
+  render(<ScheduleTransferModal label="Schedule" disabled={false} onSchedule={onSchedule} />)
   return { onSchedule }
 }
 

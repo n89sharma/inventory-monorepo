@@ -7,7 +7,7 @@ import { ScheduleDepartureModal } from './schedule-departure-modal'
 describe('ScheduleDepartureModal', () => {
   it('submits today as the ISO day by default', async () => {
     const onSchedule = vi.fn().mockResolvedValue(undefined)
-    render(<ScheduleDepartureModal onSchedule={onSchedule} />)
+    render(<ScheduleDepartureModal label="Schedule" disabled={false} onSchedule={onSchedule} />)
 
     fireEvent.click(screen.getByRole('button', { name: 'Schedule' }))
     const dialog = await screen.findByRole('dialog')
@@ -19,7 +19,7 @@ describe('ScheduleDepartureModal', () => {
   })
 
   it('labels the date as the departure date', async () => {
-    render(<ScheduleDepartureModal onSchedule={vi.fn()} />)
+    render(<ScheduleDepartureModal label="Schedule" disabled={false} onSchedule={vi.fn()} />)
 
     fireEvent.click(screen.getByRole('button', { name: 'Schedule' }))
     const dialog = await screen.findByRole('dialog')

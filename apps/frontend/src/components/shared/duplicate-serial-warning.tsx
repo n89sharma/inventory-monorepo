@@ -4,8 +4,6 @@ import { formatDateOnly } from '@/lib/formatters'
 import { isBlockingSerialMatch, type SerialNumberMatch } from 'shared-types'
 import { Link } from 'react-router-dom'
 
-const DRAFT_MATCH_MESSAGE = 'This serial number is already on an asset in this arrival.'
-
 function AssetLink({ barcode }: { barcode: string }) {
   return (
     <Link to={`/assets/${barcode}`} className="font-medium underline">
@@ -51,7 +49,6 @@ export function DuplicateSerialWarning({ check }: { check: SerialNumberCheck }) 
 
   return (
     <div className="flex flex-col gap-2">
-      {check.draftMatch && <InlineWarning>{DRAFT_MATCH_MESSAGE}</InlineWarning>}
       {check.databaseMatches.map((match) => (
         <DatabaseMatch key={match.barcode} match={match} />
       ))}

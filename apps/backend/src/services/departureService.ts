@@ -33,6 +33,8 @@ import { getNextSequence } from '../lib/db-utils.js'
 import { toYmdOrNull, todayYmd } from '../lib/date-only.js'
 import { decimalToNumber } from '../lib/decimal.js'
 import { ConflictError, NotFoundError } from '../lib/errors.js'
+import { logger } from '../lib/logger.js'
+import { pluralize } from '../lib/pluralize.js'
 import { prisma } from '../prisma.js'
 import { mapUser } from '../lib/user-mappers.js'
 import {
@@ -800,4 +802,29 @@ export async function recordDepartureRelease(
 async function getNewDepartureNumber(originCode: string): Promise<string> {
   const sequence = await getNextSequence('departure')
   return `D-${originCode}-${String(sequence).padStart(7, '0')}`
+}
+
+export async function deleteDeparture(departureNumber: string, userId: number): Promise<void> {
+  await prisma.$transaction(async (tx) => {
+    const departure = await tx.departure.findUnique({
+      where: { departure_number: departureNumber },
+      select: { id: true, status: true, _count: { select: { asset_departures: true } } },
+    })
+    if (!departure) throw new NotFoundError(`Departure ${departureNumber} not found`)
+
+    if (departure.status !== DEPARTURE_STATUS.DRAFT) {
+      throw new ConflictError(`Departure ${departureNumber} cannot be deleted after scheduling`)
+    }
+
+    const assetCount = departure._count.asset_departures
+    if (assetCount > 0) {
+      throw new ConflictError(
+        `Departure ${departureNumber} cannot be deleted because it still has ${pluralize(assetCount, 'asset')}`,
+      )
+    }
+
+    await tx.departure.delete({ where: { id: departure.id } })
+  })
+
+  logger.warn('Departure deleted', { departureNumber, userId })
 }

@@ -20,11 +20,6 @@ const ArrivalsSummaryPage = lazy(() =>
     default: m.ArrivalsSummaryPage,
   })),
 )
-const CreateArrivalPage = lazy(() =>
-  import('./components/arrivals/create-arrival-page').then((m) => ({
-    default: m.CreateArrivalPage,
-  })),
-)
 const ArrivalDetailsPage = lazy(() =>
   import('./components/arrivals/arrival-details-page').then((m) => ({
     default: m.ArrivalDetailsPage,
@@ -36,11 +31,6 @@ const TransferSummaryPage = lazy(() =>
     default: m.TransferSummaryPage,
   })),
 )
-const CreateTransferPage = lazy(() =>
-  import('./components/transfer/create-transfer-page').then((m) => ({
-    default: m.CreateTransferPage,
-  })),
-)
 const TransferDetailsPage = lazy(() =>
   import('./components/transfer/transfer-details-page').then((m) => ({
     default: m.TransferDetailsPage,
@@ -50,11 +40,6 @@ const TransferDetailsPage = lazy(() =>
 const DepartureSummaryPage = lazy(() =>
   import('@/components/departure/departures-summary-page').then((m) => ({
     default: m.DepartureSummaryPage,
-  })),
-)
-const CreateDeparturePage = lazy(() =>
-  import('@/components/departure/create-departure-page').then((m) => ({
-    default: m.CreateDeparturePage,
   })),
 )
 const DepartureDetailsPage = lazy(() =>
@@ -79,9 +64,6 @@ const HoldSummaryPage = lazy(() =>
     default: m.HoldSummaryPage,
   })),
 )
-const CreateHoldPage = lazy(() =>
-  import('./components/hold/create-hold-page').then((m) => ({ default: m.CreateHoldPage })),
-)
 const HoldDetailsPage = lazy(() =>
   import('./components/hold/hold-details-page').then((m) => ({ default: m.HoldDetailsPage })),
 )
@@ -89,11 +71,6 @@ const HoldDetailsPage = lazy(() =>
 const InvoicesSummaryPage = lazy(() =>
   import('@/components/invoice/invoices-summary-page').then((m) => ({
     default: m.InvoicesSummaryPage,
-  })),
-)
-const CreateInvoicePage = lazy(() =>
-  import('@/components/invoice/create-invoice-page').then((m) => ({
-    default: m.CreateInvoicePage,
   })),
 )
 const InvoiceDetailsPage = lazy(() =>
@@ -258,14 +235,6 @@ function AppRoutes() {
                       }
                     />
                     <Route
-                      path="/arrivals/new"
-                      element={
-                        <PermissionRoute permission="create_update_arrival">
-                          <CreateArrivalPage />
-                        </PermissionRoute>
-                      }
-                    />
-                    <Route
                       path="/arrivals/:collectionId"
                       element={
                         <PermissionRoute permission="view_collections">
@@ -283,14 +252,6 @@ function AppRoutes() {
                       }
                     />
                     <Route
-                      path="/transfers/new"
-                      element={
-                        <PermissionRoute permission="create_update_transfer">
-                          <CreateTransferPage />
-                        </PermissionRoute>
-                      }
-                    />
-                    <Route
                       path="/transfers/:collectionId"
                       element={
                         <PermissionRoute permission="view_collections">
@@ -304,14 +265,6 @@ function AppRoutes() {
                       element={
                         <PermissionRoute permission="view_collections">
                           <DepartureSummaryPage />
-                        </PermissionRoute>
-                      }
-                    />
-                    <Route
-                      path="/departures/new"
-                      element={
-                        <PermissionRoute permission="create_update_departure">
-                          <CreateDeparturePage />
                         </PermissionRoute>
                       }
                     />
@@ -359,14 +312,6 @@ function AppRoutes() {
                       }
                     />
                     <Route
-                      path="/holds/new"
-                      element={
-                        <PermissionRoute permission="create_update_hold">
-                          <CreateHoldPage />
-                        </PermissionRoute>
-                      }
-                    />
-                    <Route
                       path="/holds/:collectionId"
                       element={
                         <PermissionRoute permission="view_collections">
@@ -380,14 +325,6 @@ function AppRoutes() {
                       element={
                         <PermissionRoute permission="view_collections">
                           <InvoicesSummaryPage />
-                        </PermissionRoute>
-                      }
-                    />
-                    <Route
-                      path="/invoices/new"
-                      element={
-                        <PermissionRoute permission="create_update_invoice">
-                          <CreateInvoicePage />
                         </PermissionRoute>
                       }
                     />

@@ -1,10 +1,6 @@
 import { api } from '@/data/api/axios-client'
 import { formatDateParam, toDateParam } from '@/lib/date-param'
-import type {
-  InvoiceForm,
-  InvoiceMetadataForm,
-  InvoiceTypeFilter,
-} from '@/ui-types/invoice-form-types'
+import type { InvoiceMetadataForm, InvoiceTypeFilter } from '@/ui-types/invoice-form-types'
 import {
   getIdOrNullFromSelection,
   getSelectedOrNull,
@@ -12,6 +8,7 @@ import {
 } from '@/ui-types/select-option-types'
 import type {
   AssetDelta,
+  AssetSummary,
   CollectionHistory,
   CreateInvoice,
   InvoiceDetail,
@@ -31,15 +28,18 @@ import { z } from 'zod'
 const CreateInvoiceResponseSchema = z.object({ invoiceNumber: z.string() })
 type CreateInvoiceResponse = z.infer<typeof CreateInvoiceResponseSchema>
 
-export async function createInvoice(d: InvoiceForm): Promise<CreateInvoiceResponse> {
+export async function createInvoice(
+  metadata: InvoiceMetadataForm,
+  assets: AssetSummary[],
+): Promise<CreateInvoiceResponse> {
   const createInvoiceBody = CreateInvoiceSchema.parse({
-    invoice_reference: d.invoice_reference,
-    invoice_date: formatDateParam(d.invoice_date),
-    organization_id: d.organization!.id,
-    invoice_type_id: getIdOrNullFromSelection(d.invoice_type)!,
-    is_cleared: d.is_cleared,
-    comment: d.comment,
-    assets: d.assets as CreateInvoice['assets'],
+    invoice_reference: metadata.invoice_reference,
+    invoice_date: formatDateParam(metadata.invoice_date),
+    organization_id: metadata.organization!.id,
+    invoice_type_id: getIdOrNullFromSelection(metadata.invoice_type)!,
+    is_cleared: metadata.is_cleared,
+    comment: metadata.comment === '' ? null : metadata.comment,
+    assets,
   } satisfies CreateInvoice)
   const { data } = await api.post<CreateInvoiceResponse>('/invoices', createInvoiceBody)
   return CreateInvoiceResponseSchema.parse(data)

@@ -76,7 +76,7 @@ export const CreateInvoiceSchema = z.object({
   invoice_type_id: z.number().int(),
   is_cleared: z.boolean(),
   comment: z.string().nullable(),
-  assets: z.array(AssetSummarySchema).nonempty('No assets in the invoice').max(2000),
+  assets: z.array(AssetSummarySchema).max(2000),
 })
 export type CreateInvoice = z.infer<typeof CreateInvoiceSchema>
 

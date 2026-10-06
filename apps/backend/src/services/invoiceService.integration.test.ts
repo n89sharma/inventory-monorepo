@@ -58,6 +58,27 @@ describe('invoiceService', () => {
     expect(await getAssetStatus(asset.id)).toBe(ASSET_STATUS.IN_STOCK)
   })
 
+  it('creates an empty invoice, then links an added asset by the invoice type', async () => {
+    const { invoiceNumber } = await createInvoice(
+      buildCreateInvoiceInput(refs, [], refs.invoiceTypeSaleId),
+      refs.userId,
+    )
+    const [asset] = await createArrivedAssets(refs, 1)
+
+    await patchInvoiceAssets(
+      invoiceNumber,
+      { assetIdsToAdd: [asset.id], assetIdsToRemove: [] },
+      refs.userId,
+    )
+
+    const row = await prisma.asset.findUniqueOrThrow({
+      where: { id: asset.id },
+      select: { sales_invoice_id: true, purchase_invoice_id: true },
+    })
+    expect(row.sales_invoice_id).not.toBeNull()
+    expect(row.purchase_invoice_id).toBeNull()
+  })
+
   it('links assets to a purchase invoice via purchase_invoice_id', async () => {
     const [asset] = await createArrivedAssets(refs, 1)
     await createInvoice(

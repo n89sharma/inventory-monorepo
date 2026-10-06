@@ -1,7 +1,8 @@
-import { OUTGOING_STATUS, type CreateArrival, type UpdateAsset } from 'shared-types'
+import { OUTGOING_STATUS, type CreateAsset, type UpdateAsset } from 'shared-types'
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
 import {
   ArrivalTestData,
+  buildAsset,
   buildCreateArrivalInput,
   buildUpdateAssetSpecs,
   cleanupTransactionalData,
@@ -28,17 +29,9 @@ const PUNCTUATED_SERIAL = 'dup serial.001'
 
 type SerialOverride = { serialNumber: string; duplicateSerialAcknowledged?: boolean }
 
-// buildCreateArrivalInput generates its own unique serials; these tests need to dictate them.
-function arrivalWithSerials(refs: ArrivalTestData, overrides: SerialOverride[]): CreateArrival {
-  const input = buildCreateArrivalInput(refs, overrides.length)
-  return {
-    ...input,
-    assets: input.assets.map((asset, index) => ({
-      ...asset,
-      duplicateSerialAcknowledged: false,
-      ...overrides[index],
-    })) as CreateArrival['assets'],
-  }
+// buildAsset generates its own unique serials; these tests need to dictate them.
+function assetWithSerial(refs: ArrivalTestData, override: SerialOverride): CreateAsset {
+  return { ...buildAsset(refs), duplicateSerialAcknowledged: false, ...override }
 }
 
 async function createArrivalWithSerial(
@@ -46,12 +39,12 @@ async function createArrivalWithSerial(
   serialNumber: string,
   duplicateSerialAcknowledged = false,
 ): Promise<{ arrivalNumber: string; assetId: number; barcode: string }> {
-  const arrivalNumber = await createArrival(
-    arrivalWithSerials(refs, [{ serialNumber, duplicateSerialAcknowledged }]),
+  const arrivalNumber = await createArrival(buildCreateArrivalInput(refs), refs.userId)
+  const asset = await createSingleArrivalAsset(
+    arrivalNumber,
+    assetWithSerial(refs, { serialNumber, duplicateSerialAcknowledged }),
     refs.userId,
   )
-  const { assets } = await getArrival(arrivalNumber, ALL_PRICE_PERMISSIONS)
-  const asset = assets[0]!
   return { arrivalNumber, assetId: asset.id, barcode: asset.barcode }
 }
 
@@ -100,73 +93,10 @@ describe('duplicate serial numbers', () => {
     await cleanupTransactionalData()
   })
 
-  describe('scenario 1 — two assets with the same serial in one arrival', () => {
-    it('rejects when neither asset acknowledges the duplicate', async () => {
-      const input = arrivalWithSerials(refs, [
-        { serialNumber: EXISTING_SERIAL },
-        { serialNumber: EXISTING_SERIAL },
-      ])
-
-      await expect(createArrival(input, refs.userId)).rejects.toThrow(ConflictError)
-    })
-
-    it('writes no assets when the arrival is rejected', async () => {
-      const before = await countAssets()
-      const input = arrivalWithSerials(refs, [
-        { serialNumber: EXISTING_SERIAL },
-        { serialNumber: EXISTING_SERIAL },
-      ])
-
-      await expect(createArrival(input, refs.userId)).rejects.toThrow(ConflictError)
-
-      expect(await countAssets()).toBe(before)
-    })
-
-    // Both rows are created IN_STOCK, so the pair is the forbidden case arriving before either
-    // asset exists. No acknowledgment can permit it, wherever the flag is set.
-    it('rejects the pair however it is acknowledged', async () => {
-      const acknowledgements = [
-        [false, true],
-        [true, false],
-        [true, true],
-      ]
-
-      for (const [first, second] of acknowledgements) {
-        const input = arrivalWithSerials(refs, [
-          { serialNumber: EXISTING_SERIAL, duplicateSerialAcknowledged: first },
-          { serialNumber: EXISTING_SERIAL, duplicateSerialAcknowledged: second },
-        ])
-
-        await expect(createArrival(input, refs.userId)).rejects.toThrow(ConflictError)
-      }
-    })
-
-    it('treats punctuation and casing as the same serial number', async () => {
-      const input = arrivalWithSerials(refs, [
-        { serialNumber: EXISTING_SERIAL },
-        { serialNumber: PUNCTUATED_SERIAL },
-      ])
-
-      await expect(createArrival(input, refs.userId)).rejects.toThrow(ConflictError)
-    })
-
-    it('accepts distinct serial numbers with no acknowledgment', async () => {
-      const input = arrivalWithSerials(refs, [
-        { serialNumber: EXISTING_SERIAL },
-        { serialNumber: OTHER_SERIAL },
-      ])
-
-      const arrivalNumber = await createArrival(input, refs.userId)
-
-      const { assets } = await getArrival(arrivalNumber, ALL_PRICE_PERMISSIONS)
-      expect(assets).toHaveLength(2)
-    })
-  })
-
   describe('scenario 2 — asset added to an existing arrival', () => {
     it('rejects an unacknowledged serial that already exists', async () => {
       const { arrivalNumber } = await createArrivalWithSerial(refs, EXISTING_SERIAL)
-      const [asset] = arrivalWithSerials(refs, [{ serialNumber: EXISTING_SERIAL }]).assets
+      const asset = assetWithSerial(refs, { serialNumber: EXISTING_SERIAL })
 
       await expect(createSingleArrivalAsset(arrivalNumber, asset, refs.userId)).rejects.toThrow(
         ConflictError,
@@ -176,7 +106,7 @@ describe('duplicate serial numbers', () => {
     it('adds no asset when rejected', async () => {
       const { arrivalNumber } = await createArrivalWithSerial(refs, EXISTING_SERIAL)
       const before = await countAssets()
-      const [asset] = arrivalWithSerials(refs, [{ serialNumber: EXISTING_SERIAL }]).assets
+      const asset = assetWithSerial(refs, { serialNumber: EXISTING_SERIAL })
 
       await expect(createSingleArrivalAsset(arrivalNumber, asset, refs.userId)).rejects.toThrow(
         ConflictError,
@@ -188,9 +118,10 @@ describe('duplicate serial numbers', () => {
     it('accepts the duplicate of a sold asset once acknowledged', async () => {
       await createSoldAssetWithSerial(refs, EXISTING_SERIAL)
       const { arrivalNumber } = await createArrivalWithSerial(refs, OTHER_SERIAL)
-      const [asset] = arrivalWithSerials(refs, [
-        { serialNumber: EXISTING_SERIAL, duplicateSerialAcknowledged: true },
-      ]).assets
+      const asset = assetWithSerial(refs, {
+        serialNumber: EXISTING_SERIAL,
+        duplicateSerialAcknowledged: true,
+      })
 
       const created = await createSingleArrivalAsset(arrivalNumber, asset, refs.userId)
 
@@ -200,9 +131,10 @@ describe('duplicate serial numbers', () => {
     // The block is not an acknowledgment prompt: an in-stock holder refuses the write outright.
     it('rejects a duplicate of an in-stock asset even when acknowledged', async () => {
       const { arrivalNumber } = await createArrivalWithSerial(refs, EXISTING_SERIAL)
-      const [asset] = arrivalWithSerials(refs, [
-        { serialNumber: EXISTING_SERIAL, duplicateSerialAcknowledged: true },
-      ]).assets
+      const asset = assetWithSerial(refs, {
+        serialNumber: EXISTING_SERIAL,
+        duplicateSerialAcknowledged: true,
+      })
 
       await expect(createSingleArrivalAsset(arrivalNumber, asset, refs.userId)).rejects.toThrow(
         new ConflictError(
@@ -216,9 +148,10 @@ describe('duplicate serial numbers', () => {
       const { assetId } = await createArrivalWithSerial(refs, EXISTING_SERIAL)
       await harvestAssets([assetId], refs.userId)
       const { arrivalNumber } = await createArrivalWithSerial(refs, OTHER_SERIAL)
-      const [asset] = arrivalWithSerials(refs, [
-        { serialNumber: EXISTING_SERIAL, duplicateSerialAcknowledged: true },
-      ]).assets
+      const asset = assetWithSerial(refs, {
+        serialNumber: EXISTING_SERIAL,
+        duplicateSerialAcknowledged: true,
+      })
 
       await expect(createSingleArrivalAsset(arrivalNumber, asset, refs.userId)).rejects.toThrow(
         ConflictError,
@@ -227,7 +160,7 @@ describe('duplicate serial numbers', () => {
 
     it('accepts a distinct serial with no acknowledgment', async () => {
       const { arrivalNumber } = await createArrivalWithSerial(refs, EXISTING_SERIAL)
-      const [asset] = arrivalWithSerials(refs, [{ serialNumber: OTHER_SERIAL }]).assets
+      const asset = assetWithSerial(refs, { serialNumber: OTHER_SERIAL })
 
       const created = await createSingleArrivalAsset(arrivalNumber, asset, refs.userId)
 
@@ -238,7 +171,7 @@ describe('duplicate serial numbers', () => {
       const { assetId } = await createArrivalWithSerial(refs, EXISTING_SERIAL)
       await createLoadedDeparture(refs, [{ id: assetId, outgoing_status: OUTGOING_STATUS.SOLD }])
       const { arrivalNumber } = await createArrivalWithSerial(refs, OTHER_SERIAL)
-      const [asset] = arrivalWithSerials(refs, [{ serialNumber: EXISTING_SERIAL }]).assets
+      const asset = assetWithSerial(refs, { serialNumber: EXISTING_SERIAL })
 
       await expect(createSingleArrivalAsset(arrivalNumber, asset, refs.userId)).rejects.toThrow(
         ConflictError,
@@ -381,9 +314,10 @@ describe('duplicate serial numbers', () => {
         await createSoldAssetWithSerial(refs, EXISTING_SERIAL)
       }
       const { arrivalNumber } = await createArrivalWithSerial(refs, OTHER_SERIAL)
-      const [asset] = arrivalWithSerials(refs, [
-        { serialNumber: EXISTING_SERIAL, duplicateSerialAcknowledged: true },
-      ]).assets
+      const asset = assetWithSerial(refs, {
+        serialNumber: EXISTING_SERIAL,
+        duplicateSerialAcknowledged: true,
+      })
       const inStock = await createSingleArrivalAsset(arrivalNumber, asset, refs.userId)
 
       const result = await getSerialNumberMatches(EXISTING_SERIAL, '')
@@ -403,9 +337,10 @@ describe('duplicate serial numbers', () => {
 
     it('orders an on-hand match ahead of a departed one', async () => {
       const departed = await createSoldAssetWithSerial(refs, EXISTING_SERIAL)
-      const [onHandAsset] = arrivalWithSerials(refs, [
-        { serialNumber: EXISTING_SERIAL, duplicateSerialAcknowledged: true },
-      ]).assets
+      const onHandAsset = assetWithSerial(refs, {
+        serialNumber: EXISTING_SERIAL,
+        duplicateSerialAcknowledged: true,
+      })
       const onHand = await createSingleArrivalAsset(
         (await createArrivalWithSerial(refs, OTHER_SERIAL)).arrivalNumber,
         onHandAsset,

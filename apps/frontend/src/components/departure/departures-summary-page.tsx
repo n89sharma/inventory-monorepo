@@ -16,9 +16,10 @@ import { preloadDepartureDetail, useDeparturesList } from '@/hooks/use-departure
 import { collectionDetailHref } from '@/ui-types/navigation-context'
 import { PlusIcon } from '@phosphor-icons/react'
 import { useOptimisticSearchParams } from 'nuqs/adapters/react-router/v7'
-import { useCallback, useMemo } from 'react'
-import { Link } from 'react-router-dom'
+import { useCallback, useMemo, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import type { DepartureSummary } from 'shared-types'
+import { CreateDepartureModal } from './create-departure-modal'
 
 const DEPARTURE_DATE_DESC_SORT = { id: 'departure_date', desc: true } as const
 
@@ -73,16 +74,29 @@ export function DepartureSummaryPage(): React.JSX.Element {
           />
         </SearchBar>
       }
-      actions={
-        canCreate ? (
-          <Button asChild>
-            <Link to="/departures/new">
-              <PlusIcon />
-              New Departure
-            </Link>
-          </Button>
-        ) : undefined
-      }
+      actions={canCreate ? <NewDepartureAction /> : undefined}
     />
+  )
+}
+
+function NewDepartureAction(): React.JSX.Element {
+  const [createOpen, setCreateOpen] = useState(false)
+  const navigate = useNavigate()
+  const searchParams = useOptimisticSearchParams()
+
+  return (
+    <>
+      <Button onClick={() => setCreateOpen(true)}>
+        <PlusIcon />
+        New Departure
+      </Button>
+      <CreateDepartureModal
+        open={createOpen}
+        onOpenChange={setCreateOpen}
+        onCreated={(departureNumber) =>
+          navigate(collectionDetailHref('departures', departureNumber, searchParams))
+        }
+      />
+    </>
   )
 }

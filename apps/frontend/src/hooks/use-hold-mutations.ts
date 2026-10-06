@@ -9,13 +9,13 @@ import {
 import { invalidateAssetDetails } from '@/hooks/use-asset-detail'
 import { holdDetailKey, invalidateHoldLists } from '@/hooks/use-hold'
 import { flushPendingRemovals, scheduleBulkAssetRemoval } from '@/lib/asset-removal-undo'
-import type { HoldForm, HoldMetadataForm } from '@/ui-types/hold-form-types'
+import type { HoldMetadataForm } from '@/ui-types/hold-form-types'
 import type { AssetIdentity, AssetSearchRow, AssetSummary } from 'shared-types'
 import { mutate } from 'swr'
 
-async function create(data: HoldForm) {
-  const result = await createHold(data)
-  invalidateAssetDetails(data.assets.map((a) => a.barcode))
+async function create(metadata: HoldMetadataForm, assets: AssetSummary[]) {
+  const result = await createHold(metadata, assets)
+  invalidateAssetDetails(assets.map((a) => a.barcode))
   invalidateHoldLists()
   return result
 }

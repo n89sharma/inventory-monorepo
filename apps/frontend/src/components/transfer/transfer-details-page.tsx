@@ -210,7 +210,6 @@ export function TransferDetailsPage(): React.JSX.Element {
             open={addFromHoldOpen}
             onOpenChange={setAddFromHoldOpen}
             getAssets={() => transfer.assets}
-            onAddAsset={() => {}}
             onCommitBatch={(assets) => mutations.addAssetBatch(transferNumber, assets)}
           />
         ),

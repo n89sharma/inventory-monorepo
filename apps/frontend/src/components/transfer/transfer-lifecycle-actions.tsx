@@ -86,7 +86,15 @@ export function TransferLifecycleActions({
   if (!canCreateEditTransfer) return null
 
   if (status === TRANSFER_STATUS.DRAFT) {
-    return <ScheduleTransferModal onSchedule={onSchedule} />
+    const disabled = assetCount === 0
+    const emptyLabel = disabled ? ' (no assets)' : ''
+    return (
+      <ScheduleTransferModal
+        label={`Schedule${emptyLabel}`}
+        disabled={disabled}
+        onSchedule={onSchedule}
+      />
+    )
   }
 
   if (status === TRANSFER_STATUS.SCHEDULED) {
