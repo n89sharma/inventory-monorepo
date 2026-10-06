@@ -1,7 +1,7 @@
 import type { SalesWindowMonths } from '@/lib/filters/parsers'
 import { formatDateParam } from '@/lib/date-param'
 import { isBefore, parseISO, startOfDay, subMonths } from 'date-fns'
-import type { ModelPriceHistoryRow } from 'shared-types'
+import { median, type ModelPriceHistoryRow } from 'shared-types'
 
 export const METER_BANDS = [
   { name: 'Low count', label: '<70K', min: null, max: 70_000 },
@@ -36,14 +36,6 @@ export function filterByMonths(
 ): ModelPriceHistoryRow[] {
   const windowStart = parseISO(salesWindowStart(months, now))
   return sales.filter((sale) => !isBefore(parseISO(sale.departed_at), windowStart))
-}
-
-export function median(values: number[]): number | null {
-  if (values.length === 0) return null
-  const sorted = [...values].sort((a, b) => a - b)
-  const mid = Math.floor(sorted.length / 2)
-  if (sorted.length % 2 === 1) return sorted[mid]
-  return (sorted[mid - 1] + sorted[mid]) / 2
 }
 
 function isInBand(meter: number, band: { min: number | null; max: number | null }): boolean {

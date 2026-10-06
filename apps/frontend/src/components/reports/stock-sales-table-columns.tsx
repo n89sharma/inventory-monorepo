@@ -1,10 +1,8 @@
 import type { StockSalesModelRow } from '@/lib/stock-sales-grouping'
 import { formatMarginPercent, formatTitleCase, formatUSDWithSymbol } from '@/lib/formatters'
 import type { SalesWindowMonths } from '@/lib/filters/parsers'
-import { modelPriceHistoryHref } from '@/lib/filters/serializers'
-import { ArrowSquareOutIcon } from '@phosphor-icons/react'
-import type { ColumnDef, Row, SortingFn } from '@tanstack/react-table'
-import { Link } from 'react-router-dom'
+import { ModelPriceHistoryLink } from '@/components/shared/model-price-history-link'
+import type { ColumnDef, SortingFn } from '@tanstack/react-table'
 
 function nullsLow(value: number | null): number {
   return value ?? Number.NEGATIVE_INFINITY
@@ -25,25 +23,6 @@ const sortBySalePrice = rowSorter(
 )
 const sortByMargin = rowSorter((a, b) => nullsLow(a.margin_percent) - nullsLow(b.margin_percent))
 const sortByProfit = rowSorter((a, b) => nullsLow(a.profit) - nullsLow(b.profit))
-
-function PriceHistoryCell({
-  row,
-  months,
-}: {
-  row: Row<StockSalesModelRow>
-  months: SalesWindowMonths
-}): React.JSX.Element {
-  const { model_id, model_name } = row.original
-  return (
-    <Link
-      to={modelPriceHistoryHref(model_id, months)}
-      aria-label={`Price history for ${model_name}`}
-      className="inline-flex text-muted-foreground hover:text-foreground"
-    >
-      <ArrowSquareOutIcon className="size-4" />
-    </Link>
-  )
-}
 
 export function createStockSalesColumns(
   months: SalesWindowMonths,
@@ -119,7 +98,13 @@ export function createStockSalesColumns(
       id: 'price_history',
       header: 'Price History',
       enableSorting: false,
-      cell: ({ row }) => <PriceHistoryCell row={row} months={months} />,
+      cell: ({ row }) => (
+        <ModelPriceHistoryLink
+          modelId={row.original.model_id}
+          modelName={row.original.model_name}
+          months={months}
+        />
+      ),
     },
   ]
 }

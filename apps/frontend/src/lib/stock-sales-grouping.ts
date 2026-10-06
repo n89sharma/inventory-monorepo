@@ -1,11 +1,11 @@
 import type { StockSalesMode } from '@/lib/filters/parsers'
-import { median } from '@/lib/model-price-history-summary'
-import type {
-  MeterBand,
-  ModelSummary,
-  StockSalesReport,
-  StockSalesRow,
-  StockSalesSalePriceGroup,
+import {
+  median,
+  type MeterBand,
+  type ModelSummary,
+  type StockSalesReport,
+  type StockSalesRow,
+  type StockSalesSalePriceGroup,
 } from 'shared-types'
 
 type CostTotals = {
