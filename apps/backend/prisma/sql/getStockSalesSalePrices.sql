@@ -14,7 +14,9 @@ select
     when h.meter_total < 210000  then 'MEDIUM'
     else 'HIGH'
   end                              as meter_band,
-  array_agg(c.sale_price::float8)  as sale_prices
+  array_agg(c.sale_price::float8)  as sale_prices,
+  -- A missing cost reads as zero, matching getProfitabilityCube.sql.
+  sum(c.sale_price - coalesce(c.total_cost, 0))::float8 as profit_sum
 from "Asset" a
 join "Departure" d on d.id = a.departure_id
 join "Cost" c      on c.asset_id = a.id

@@ -7,6 +7,7 @@ import { prisma } from '../prisma.js'
 
 const VIEW_COST_PERMISSION = 'view_purchase_price'
 const VIEW_SALE_PERMISSION = 'view_sale_price'
+const VIEW_PROFITABILITY_PERMISSION = 'view_profitability_report'
 
 async function getStock(permissions: ReadonlySet<Permission>) {
   const statuses = await prisma.status.findMany({
@@ -28,7 +29,13 @@ async function getSalePrices(salesFrom: string, permissions: ReadonlySet<Permiss
     select: { id: true },
   })
   const rows = await prisma.$queryRawTyped(getStockSalesSalePricesQuery(soldStatus.id, salesFrom))
-  return rows.map((row) => ({ ...row, sale_prices: row.sale_prices ?? [] }))
+  const canViewProfit =
+    permissions.has(VIEW_COST_PERMISSION) && permissions.has(VIEW_PROFITABILITY_PERMISSION)
+  return rows.map((row) => ({
+    ...row,
+    sale_prices: row.sale_prices ?? [],
+    profit_sum: canViewProfit ? row.profit_sum : null,
+  }))
 }
 
 export async function getStockSalesReport(salesFrom: string, permissions: ReadonlySet<Permission>) {

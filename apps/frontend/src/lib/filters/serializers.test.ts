@@ -120,6 +120,7 @@ const IRADX_ROW: StockSalesModelRow = {
   median_sale_price: null,
   margin_percent: null,
   sales_count: 0,
+  profit: null,
 }
 
 describe('onHandDrilldownHref', () => {

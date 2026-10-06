@@ -1,4 +1,4 @@
-import { OUTGOING_STATUS } from 'shared-types'
+import { OUTGOING_STATUS, type Permission } from 'shared-types'
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
 import {
   ALL_PRICE_PERMISSIONS,
@@ -21,13 +21,22 @@ import { updateAssetSpecs } from './assetSpecsService.js'
 import { createHold } from './holdService.js'
 import { getStockSalesReport } from './stockSalesService.js'
 
+const PROFIT_PERMISSIONS: ReadonlySet<Permission> = new Set([
+  ...ALL_PRICE_PERMISSIONS,
+  'view_profitability_report',
+])
 const SALES_FROM = '2026-04-05'
 const DAY_BEFORE_SALES_FROM = '2026-04-04'
 
 describe('stockSalesService', () => {
   let refs: ArrivalTestData
 
-  async function sell(salePrice: number, departureDate: string, meterBlack: number | null) {
+  async function sell(
+    salePrice: number,
+    departureDate: string,
+    meterBlack: number | null,
+    totalCost: number | null = null,
+  ) {
     const [asset] = await createArrivedAssets(refs, 1)
     if (meterBlack === null) {
       await prisma.technicalSpecification.update({
@@ -41,7 +50,11 @@ describe('stockSalesService', () => {
         refs.userId,
       )
     }
-    await patchAssetPricing(asset.barcode, { sale_price: salePrice }, refs.userId)
+    await seedAssetCost(asset.id, {
+      ...REDACTED_ASSET_COST,
+      total_cost: totalCost,
+      sale_price: salePrice,
+    })
     const departureNumber = await createLoadedDeparture(refs, [
       { id: asset.id, outgoing_status: OUTGOING_STATUS.SOLD },
     ])
@@ -218,5 +231,22 @@ describe('stockSalesService', () => {
       purchase_cost_sum: (SEEDED_ASSET_COST.purchase_cost ?? 0) * 2,
       purchase_cost_count: 2,
     })
+  })
+
+  it('sums profit as sale price minus total cost, reading a missing cost as zero', async () => {
+    await sell(500, SALES_FROM, 10000, 300)
+    await sell(400, SALES_FROM, 10000, null)
+
+    const report = await getStockSalesReport(SALES_FROM, PROFIT_PERMISSIONS)
+    const group = report.sale_prices?.find((g) => g.model_id === refs.model.id)
+    expect(group?.profit_sum).toBe(200 + 400)
+  })
+
+  it('withholds profit from a caller without the profitability permission', async () => {
+    await sell(500, SALES_FROM, 10000, 300)
+
+    const report = await getStockSalesReport(SALES_FROM, ALL_PRICE_PERMISSIONS)
+    const group = report.sale_prices?.find((g) => g.model_id === refs.model.id)
+    expect(group).toMatchObject({ sale_prices: [500], profit_sum: null })
   })
 })

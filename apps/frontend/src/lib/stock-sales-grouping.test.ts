@@ -48,8 +48,13 @@ function identity({ model, brand = CANON, type = COPIER }: Identity) {
   }
 }
 
-function sold(item: Identity, band: MeterBand, salePrices: number[]): StockSalesSalePriceGroup {
-  return { ...identity(item), meter_band: band, sale_prices: salePrices }
+function sold(
+  item: Identity,
+  band: MeterBand,
+  salePrices: number[],
+  profit: number | null = null,
+): StockSalesSalePriceGroup {
+  return { ...identity(item), meter_band: band, sale_prices: salePrices, profit_sum: profit }
 }
 
 function stocked({ band, assets, held = 0, purchaseCosts, ...item }: Stock): StockSalesRow {
@@ -208,7 +213,7 @@ describe('buildStockSalesGroups sale prices', () => {
 
 describe('buildStockSalesGroups sold mode', () => {
   it('lists a model with sales but nothing on hand, with zero counts and blank costs', () => {
-    const [group] = soldMode([], [sold({ model: MPC, brand: RICOH }, 'LOW', [500, 700])])
+    const [group] = soldMode([], [sold({ model: MPC, brand: RICOH }, 'LOW', [500, 700], 300)])
     expect(group).toEqual({
       ...identity({ model: MPC, brand: RICOH }),
       in_stock_count: 0,
@@ -218,6 +223,7 @@ describe('buildStockSalesGroups sold mode', () => {
       median_sale_price: 600,
       margin_percent: null,
       sales_count: 2,
+      profit: 300,
     })
   })
 
@@ -267,5 +273,30 @@ describe('summarizeStockSales', () => {
 
   it('is zero for no rows', () => {
     expect(summarizeStockSales([])).toEqual({ in_stock_count: 0, held_count: 0, sales_count: 0 })
+  })
+})
+
+describe('buildStockSalesGroups profit', () => {
+  const iradxStock = stocked({ model: IRADX, band: 'LOW', assets: 1, purchaseCosts: [] })
+  const iradxSales = [
+    sold({ model: IRADX }, 'LOW', [1000], 400),
+    sold({ model: IRADX }, 'HIGH', [500], -100),
+  ]
+
+  it('adds up profit across meter bands', () => {
+    const [group] = stockMode([iradxStock], iradxSales)
+    expect(group.profit).toBe(300)
+  })
+
+  it('takes the profit of the selected band only', () => {
+    const highStock = { ...iradxStock, meter_band: 'HIGH' as const }
+    const [group] = soldMode([highStock], iradxSales, { ...NO_FILTERS, band: 'HIGH' })
+    expect(group.profit).toBe(-100)
+  })
+
+  it('leaves profit blank when it was withheld or there were no sales', () => {
+    const withheld = [sold({ model: IRADX }, 'LOW', [1000])]
+    expect(stockMode([iradxStock], withheld)[0].profit).toBeNull()
+    expect(stockMode([iradxStock])[0].profit).toBeNull()
   })
 })

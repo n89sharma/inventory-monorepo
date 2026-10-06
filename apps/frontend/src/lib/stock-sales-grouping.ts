@@ -28,6 +28,7 @@ export type StockSalesModelRow = ModelIdentity & {
   median_sale_price: number | null
   margin_percent: number | null
   sales_count: number
+  profit: number | null
 }
 
 export type StockSalesFilters = {
@@ -41,7 +42,7 @@ type StockAccumulator = ModelIdentity &
     held_count: number
   }
 
-type SalesAccumulator = ModelIdentity & { sale_prices: number[] }
+type SalesAccumulator = ModelIdentity & { sale_prices: number[]; profit: number | null }
 
 const NO_SALE_PRICES: number[] = []
 const NO_SALE_PRICE_GROUPS: StockSalesSalePriceGroup[] = []
@@ -121,17 +122,28 @@ function accumulateSales(groups: StockSalesSalePriceGroup[]): Map<number, SalesA
     const existing = salesByModel.get(group.model_id)
     if (existing) {
       existing.sale_prices.push(...group.sale_prices)
+      existing.profit = addNullable(existing.profit, group.profit_sum)
     } else {
       salesByModel.set(group.model_id, {
         ...identityOf(group),
         sale_prices: [...group.sale_prices],
+        profit: group.profit_sum,
       })
     }
   }
   return salesByModel
 }
 
-function toModelRow(stock: StockAccumulator, salePrices: number[]): StockSalesModelRow {
+const NO_SALES: Pick<SalesAccumulator, 'sale_prices' | 'profit'> = {
+  sale_prices: NO_SALE_PRICES,
+  profit: null,
+}
+
+function toModelRow(
+  stock: StockAccumulator,
+  sales: Pick<SalesAccumulator, 'sale_prices' | 'profit'>,
+): StockSalesModelRow {
+  const salePrices = sales.sale_prices
   const avgTotalCost = average(stock.total_cost_sum, stock.total_cost_count)
   const medianSalePrice = median(salePrices)
   return {
@@ -143,6 +155,7 @@ function toModelRow(stock: StockAccumulator, salePrices: number[]): StockSalesMo
     median_sale_price: medianSalePrice,
     margin_percent: marginPercent(medianSalePrice, avgTotalCost),
     sales_count: salePrices.length,
+    profit: sales.profit,
   }
 }
 
@@ -157,13 +170,13 @@ export function buildStockSalesGroups(
 
   if (mode === 'stock') {
     return Array.from(stockByModel.values(), (stock) =>
-      toModelRow(stock, salesByModel.get(stock.model_id)?.sale_prices ?? NO_SALE_PRICES),
+      toModelRow(stock, salesByModel.get(stock.model_id) ?? NO_SALES),
     )
   }
   return Array.from(salesByModel.values(), (sales) =>
     toModelRow(
       stockByModel.get(sales.model_id) ?? { ...identityOf(sales), ...NOTHING_ON_HAND },
-      sales.sale_prices,
+      sales,
     ),
   )
 }

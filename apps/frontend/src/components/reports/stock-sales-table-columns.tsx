@@ -24,6 +24,7 @@ const sortBySalePrice = rowSorter(
   (a, b) => nullsLow(a.median_sale_price) - nullsLow(b.median_sale_price),
 )
 const sortByMargin = rowSorter((a, b) => nullsLow(a.margin_percent) - nullsLow(b.margin_percent))
+const sortByProfit = rowSorter((a, b) => nullsLow(a.profit) - nullsLow(b.profit))
 
 function PriceHistoryCell({
   row,
@@ -105,6 +106,13 @@ export function createStockSalesColumns(
     {
       accessorKey: 'sales_count',
       header: 'Sales',
+      meta: { cellClassName: 'text-center tabular-nums' },
+    },
+    {
+      accessorKey: 'profit',
+      header: 'Profit',
+      cell: ({ row }) => formatUSDWithSymbol(row.original.profit),
+      sortingFn: sortByProfit,
       meta: { cellClassName: 'text-center tabular-nums' },
     },
     {

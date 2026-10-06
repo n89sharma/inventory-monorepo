@@ -29,6 +29,7 @@ export const StockSalesSalePriceGroupSchema = z.object({
   model_name: z.string(),
   meter_band: z.enum(METER_BAND),
   sale_prices: z.array(z.number()),
+  profit_sum: z.number().nullable(),
 })
 export type StockSalesSalePriceGroup = z.infer<typeof StockSalesSalePriceGroupSchema>
 

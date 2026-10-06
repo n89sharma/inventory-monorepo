@@ -46,10 +46,15 @@ const ASSET_TYPE_PARAM_KEY = 'asset_type'
 const EMPTY_REPORT: StockSalesReport = { stock: [], sale_prices: null }
 const STOCK_MODE: StockSalesMode = 'stock'
 const SOLD_MODE: StockSalesMode = 'sold'
-const DEFAULT_SORTS = {
-  stock: { id: 'in_stock_count', desc: true },
-  sold: { id: 'sales_count', desc: true },
-} as const satisfies Record<StockSalesMode, { id: string; desc: boolean }>
+const IN_STOCK_SORT = { id: 'in_stock_count', desc: true }
+const SALES_SORT = { id: 'sales_count', desc: true }
+const PROFIT_SORT = { id: 'profit', desc: true }
+
+function defaultSort(mode: StockSalesMode, canViewProfit: boolean) {
+  if (mode === STOCK_MODE) return IN_STOCK_SORT
+  if (canViewProfit) return PROFIT_SORT
+  return SALES_SORT
+}
 const NO_STOCK_MESSAGE = 'No on-hand assets match these filters.'
 
 function emptyMessage(mode: StockSalesMode, months: SalesWindowMonths): string {
@@ -100,6 +105,7 @@ function StockSalesModeToggle({
 
 function StockSalesBody({
   mode,
+  sort,
   months,
   rows,
   hasRowsOfAnyType,
@@ -111,6 +117,7 @@ function StockSalesBody({
   getRowHref,
 }: {
   mode: StockSalesMode
+  sort: { id: string; desc: boolean }
   months: SalesWindowMonths
   rows: StockSalesModelRow[]
   hasRowsOfAnyType: boolean
@@ -137,7 +144,7 @@ function StockSalesBody({
       label={TABLE_LABEL}
       columns={columns}
       data={rows}
-      defaultSort={DEFAULT_SORTS[mode]}
+      defaultSort={sort}
       getRowHref={getRowHref}
       columnVisibility={columnVisibility}
       renderToolbar={() => (
@@ -161,6 +168,8 @@ export function StockSalesReportPage(): React.JSX.Element {
 
   const canViewPurchase = useCan('view_purchase_price')
   const canViewSale = useCan('view_sale_price')
+  const canViewProfitability = useCan('view_profitability_report')
+  const canViewProfit = canViewSale && canViewPurchase && canViewProfitability
   const mode = canViewSale ? requestedMode : STOCK_MODE
 
   const { data: report = EMPTY_REPORT, isLoading } = useStockSalesReport(months)
@@ -193,8 +202,9 @@ export function StockSalesReportPage(): React.JSX.Element {
       median_sale_price: canViewSale,
       margin_percent: canViewPurchase && canViewSale,
       sales_count: canViewSale,
+      profit: canViewProfit,
     }),
-    [canViewPurchase, canViewSale],
+    [canViewPurchase, canViewSale, canViewProfit],
   )
 
   return (
@@ -240,6 +250,7 @@ export function StockSalesReportPage(): React.JSX.Element {
         <StockSalesSummaryStrip rows={visibleRows} canViewSale={canViewSale} />
         <StockSalesBody
           mode={mode}
+          sort={defaultSort(mode, canViewProfit)}
           months={months}
           rows={visibleRows}
           hasRowsOfAnyType={rowsOfAnyType.length > 0}
