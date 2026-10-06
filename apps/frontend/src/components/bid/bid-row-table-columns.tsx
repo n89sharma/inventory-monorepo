@@ -4,11 +4,11 @@ import { EditableAmountCell, type AmountInputProps } from '@/components/shared/e
 import { PercentInput } from '@/components/shared/percent-input'
 import { PriceInput } from '@/components/shared/price-input'
 import { createSelectColumn } from '@/components/table-columns/column-primitives'
-import { classifyBidColumns, type BidColumn } from '@/lib/bid-column-recognition'
-import { formatUSDWithSymbol } from '@/lib/formatters'
+import { parseBidMeterReading, type LabelledBidColumn } from '@/lib/bid-column-labels'
+import { formatThousandsK, formatUSDWithSymbol } from '@/lib/formatters'
 import type { PriceCellEditorRegistry } from '@/lib/price-cell-navigation'
 import type { ColumnDef } from '@tanstack/react-table'
-import type { BidRow } from 'shared-types'
+import { BID_COLUMN_ROLE, type BidRow } from 'shared-types'
 
 const BID_PRICE_FIELDS = ['selling_price', 'transport_cost', 'margin_percent'] as const
 
@@ -74,23 +74,38 @@ export type BidRowEditing = {
   toggleZeroPrice: (row: BidRow) => Promise<void>
 }
 
-function pastedColumnId(column: BidColumn): string {
+function pastedColumnId(column: LabelledBidColumn): string {
   return `${PASTED_COLUMN_ID_PREFIX}${column.index}`
 }
 
-function pastedColumnLabel(column: BidColumn): string {
-  return column.label === '' ? `Column ${column.index + 1}` : column.label
+function meterReadingOrLowest(text: unknown): number {
+  return parseBidMeterReading(String(text)) ?? Number.NEGATIVE_INFINITY
 }
 
-function pastedColumn(column: BidColumn): ColumnDef<BidRow> {
+function meterColumn(column: ColumnDef<BidRow>): ColumnDef<BidRow> {
   return {
+    ...column,
+    cell: ({ getValue }) => {
+      const text = String(getValue())
+      const reading = parseBidMeterReading(text)
+      return reading === null ? text : formatThousandsK(reading)
+    },
+    sortingFn: (rowA, rowB, columnId) =>
+      meterReadingOrLowest(rowA.getValue(columnId)) - meterReadingOrLowest(rowB.getValue(columnId)),
+  }
+}
+
+function pastedColumn(column: LabelledBidColumn): ColumnDef<BidRow> {
+  const definition: ColumnDef<BidRow> = {
     id: pastedColumnId(column),
     header: column.label,
     accessorFn: (row) => row.cells[column.index] ?? '',
     meta: {
-      headerClassName: column.recognized ? RECOGNIZED_HEADER_CLASS : UNRECOGNIZED_HEADER_CLASS,
+      headerClassName: column.role === null ? UNRECOGNIZED_HEADER_CLASS : RECOGNIZED_HEADER_CLASS,
     },
   }
+  if (column.role === BID_COLUMN_ROLE.TOTAL_METER) return meterColumn(definition)
+  return definition
 }
 
 function formatPercent(value: number | null): string {
@@ -223,20 +238,17 @@ function pricingColumns(editing: BidRowEditing | undefined): ColumnDef<BidRow>[]
 }
 
 export function buildBidGridColumns(
-  headers: readonly string[],
+  sheetColumns: readonly LabelledBidColumn[],
   editing: BidRowEditing | undefined,
 ): ColumnDef<BidRow>[] {
-  const pasted = classifyBidColumns(headers)
-  const recognized = pasted.filter((column) => column.recognized).map(pastedColumn)
-  const unrecognized = pasted.filter((column) => !column.recognized).map(pastedColumn)
   const select = editing ? [createSelectColumn<BidRow>()] : []
-  return [...select, ...recognized, ...unrecognized, ...pricingColumns(editing)]
+  return [...select, ...sheetColumns.map(pastedColumn), ...pricingColumns(editing)]
 }
 
-export function bidPickerColumns(headers: readonly string[]): PickerColumn[] {
-  const sheetColumns = classifyBidColumns(headers).map((column) => ({
+export function bidPickerColumns(sheetColumns: readonly LabelledBidColumn[]): PickerColumn[] {
+  const pickerSheetColumns = sheetColumns.map((column) => ({
     id: pastedColumnId(column),
-    label: pastedColumnLabel(column),
+    label: column.label,
     section: SHEET_SECTION_ID,
   }))
   const pricing = Object.entries(PRICING_COLUMN_LABELS).map(([id, label]) => ({
@@ -244,5 +256,5 @@ export function bidPickerColumns(headers: readonly string[]): PickerColumn[] {
     label,
     section: PRICING_SECTION_ID,
   }))
-  return [...sheetColumns, ...pricing]
+  return [...pickerSheetColumns, ...pricing]
 }

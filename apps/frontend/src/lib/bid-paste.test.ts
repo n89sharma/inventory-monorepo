@@ -47,6 +47,55 @@ describe('parseBidPaste', () => {
     expect(result).toMatchObject({ ok: true, upload: { rows: [['S1'], ['S2']] } })
   })
 
+  it('drops lines that hold only empty cells', () => {
+    const result = parseBidPaste('Serial\tModel\nS1\tC3000\n\t\nS2\tC4500', true)
+    expect(result).toMatchObject({
+      ok: true,
+      upload: {
+        rows: [
+          ['S1', 'C3000'],
+          ['S2', 'C4500'],
+        ],
+      },
+    })
+  })
+
+  it('drops columns with no header and no values', () => {
+    const result = parseBidPaste(
+      '\tBrand\t\tModel\t\n1\tCanon\t\tC3000\t\n2\tRicoh\t\tC4500\t',
+      true,
+    )
+    expect(result).toEqual({
+      ok: true,
+      upload: {
+        headers: ['', 'Brand', 'Model'],
+        rows: [
+          ['1', 'Canon', 'C3000'],
+          ['2', 'Ricoh', 'C4500'],
+        ],
+      },
+    })
+  })
+
+  it('keeps a named column even when every value is empty', () => {
+    const result = parseBidPaste('Serial\tBID:\nS1\t', true)
+    expect(result).toMatchObject({ ok: true, upload: { headers: ['Serial', 'BID:'] } })
+  })
+
+  it('drops empty columns when there is no header row', () => {
+    const result = parseBidPaste('S1\t\tC3000\nS2\t\tC4500', false)
+    expect(result).toMatchObject({
+      ok: true,
+      upload: {
+        headers: ['', ''],
+        rows: [
+          ['S1', 'C3000'],
+          ['S2', 'C4500'],
+        ],
+      },
+    })
+  })
+
   it('rejects a paste with no data rows', () => {
     expect(parseBidPaste('Serial\tModel', true)).toEqual({
       ok: false,

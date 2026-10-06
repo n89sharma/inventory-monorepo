@@ -2,16 +2,25 @@ import {
   concludeBid,
   createBid,
   deleteBid,
+  removeBidRows,
   returnBidToDraft,
   reviewBid,
   submitBid,
+  updateBidColumnMappings,
   updateBidMetadata,
   updateBidRows,
   uploadBidRows,
 } from '@/data/api/bid-api'
 import { bidDetailKey, clearBidDetail, invalidateBidLists } from '@/hooks/use-bid'
+import { flushPendingRemovals, scheduleRemoval } from '@/lib/removal-undo'
 import type { BidForm } from '@/ui-types/bid-form-types'
-import type { BidDetail, BidOutcome, UpdateBidRows, UploadBidRows } from 'shared-types'
+import type {
+  BidDetail,
+  BidOutcome,
+  UpdateBidColumnMappings,
+  UpdateBidRows,
+  UploadBidRows,
+} from 'shared-types'
 import { mutate } from 'swr'
 
 function refresh(bidNumber: string) {
@@ -49,6 +58,10 @@ async function updateRows(bidNumber: string, update: UpdateBidRows) {
   adoptDetail(bidNumber, await updateBidRows(bidNumber, update))
 }
 
+async function mapColumns(bidNumber: string, update: UpdateBidColumnMappings) {
+  adoptDetail(bidNumber, await updateBidColumnMappings(bidNumber, update))
+}
+
 function withNoBid(bid: BidDetail, rowId: number, noBid: boolean): BidDetail {
   return {
     ...bid,
@@ -84,6 +97,20 @@ async function setNoBid(bid: BidDetail, rowId: number, noBid: boolean) {
   invalidateBidLists()
 }
 
+function removeRows(bidNumber: string, rowIds: [number, ...number[]]) {
+  const removedIds = new Set(rowIds)
+  scheduleRemoval<BidDetail>({
+    collectionId: bidNumber,
+    detailCacheKey: bidDetailKey(bidNumber),
+    hideRemoved: (bid) => ({ ...bid, rows: bid.rows.filter((row) => !removedIds.has(row.id)) }),
+    persist: async () => {
+      await removeBidRows(bidNumber, { row_ids: rowIds })
+      invalidateBidLists()
+    },
+    label: rowIds.length === 1 ? 'Removed 1 row' : `Removed ${rowIds.length} rows`,
+  })
+}
+
 async function review(bidNumber: string) {
   await reviewBid(bidNumber)
   refresh(bidNumber)
@@ -110,7 +137,10 @@ const mutations = {
   updateMetadata,
   upload,
   updateRows,
+  mapColumns,
   setNoBid,
+  removeRows,
+  flushPending: flushPendingRemovals,
   review,
   returnToDraft,
   submit,

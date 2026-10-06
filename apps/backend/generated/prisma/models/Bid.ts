@@ -303,6 +303,7 @@ export type BidWhereInput = {
   vendor?: Prisma.XOR<Prisma.OrganizationScalarRelationFilter, Prisma.OrganizationWhereInput>
   created_by?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   rows?: Prisma.BidRowListRelationFilter
+  column_mappings?: Prisma.BidColumnMappingListRelationFilter
 }
 
 export type BidOrderByWithRelationInput = {
@@ -323,6 +324,7 @@ export type BidOrderByWithRelationInput = {
   vendor?: Prisma.OrganizationOrderByWithRelationInput
   created_by?: Prisma.UserOrderByWithRelationInput
   rows?: Prisma.BidRowOrderByRelationAggregateInput
+  column_mappings?: Prisma.BidColumnMappingOrderByRelationAggregateInput
 }
 
 export type BidWhereUniqueInput = Prisma.AtLeast<{
@@ -346,6 +348,7 @@ export type BidWhereUniqueInput = Prisma.AtLeast<{
   vendor?: Prisma.XOR<Prisma.OrganizationScalarRelationFilter, Prisma.OrganizationWhereInput>
   created_by?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   rows?: Prisma.BidRowListRelationFilter
+  column_mappings?: Prisma.BidColumnMappingListRelationFilter
 }, "id" | "bid_number">
 
 export type BidOrderByWithAggregationInput = {
@@ -405,6 +408,7 @@ export type BidCreateInput = {
   vendor: Prisma.OrganizationCreateNestedOneWithoutBidsInput
   created_by: Prisma.UserCreateNestedOneWithoutBids_createdInput
   rows?: Prisma.BidRowCreateNestedManyWithoutBidInput
+  column_mappings?: Prisma.BidColumnMappingCreateNestedManyWithoutBidInput
 }
 
 export type BidUncheckedCreateInput = {
@@ -423,6 +427,7 @@ export type BidUncheckedCreateInput = {
   created_by_id: number
   created_at: Date | string
   rows?: Prisma.BidRowUncheckedCreateNestedManyWithoutBidInput
+  column_mappings?: Prisma.BidColumnMappingUncheckedCreateNestedManyWithoutBidInput
 }
 
 export type BidUpdateInput = {
@@ -440,6 +445,7 @@ export type BidUpdateInput = {
   vendor?: Prisma.OrganizationUpdateOneRequiredWithoutBidsNestedInput
   created_by?: Prisma.UserUpdateOneRequiredWithoutBids_createdNestedInput
   rows?: Prisma.BidRowUpdateManyWithoutBidNestedInput
+  column_mappings?: Prisma.BidColumnMappingUpdateManyWithoutBidNestedInput
 }
 
 export type BidUncheckedUpdateInput = {
@@ -458,6 +464,7 @@ export type BidUncheckedUpdateInput = {
   created_by_id?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rows?: Prisma.BidRowUncheckedUpdateManyWithoutBidNestedInput
+  column_mappings?: Prisma.BidColumnMappingUncheckedUpdateManyWithoutBidNestedInput
 }
 
 export type BidCreateManyInput = {
@@ -605,6 +612,20 @@ export type BidUpdateheadersInput = {
   push?: string | string[]
 }
 
+export type BidCreateNestedOneWithoutColumn_mappingsInput = {
+  create?: Prisma.XOR<Prisma.BidCreateWithoutColumn_mappingsInput, Prisma.BidUncheckedCreateWithoutColumn_mappingsInput>
+  connectOrCreate?: Prisma.BidCreateOrConnectWithoutColumn_mappingsInput
+  connect?: Prisma.BidWhereUniqueInput
+}
+
+export type BidUpdateOneRequiredWithoutColumn_mappingsNestedInput = {
+  create?: Prisma.XOR<Prisma.BidCreateWithoutColumn_mappingsInput, Prisma.BidUncheckedCreateWithoutColumn_mappingsInput>
+  connectOrCreate?: Prisma.BidCreateOrConnectWithoutColumn_mappingsInput
+  upsert?: Prisma.BidUpsertWithoutColumn_mappingsInput
+  connect?: Prisma.BidWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.BidUpdateToOneWithWhereWithoutColumn_mappingsInput, Prisma.BidUpdateWithoutColumn_mappingsInput>, Prisma.BidUncheckedUpdateWithoutColumn_mappingsInput>
+}
+
 export type BidCreateNestedOneWithoutRowsInput = {
   create?: Prisma.XOR<Prisma.BidCreateWithoutRowsInput, Prisma.BidUncheckedCreateWithoutRowsInput>
   connectOrCreate?: Prisma.BidCreateOrConnectWithoutRowsInput
@@ -703,6 +724,92 @@ export type BidUncheckedUpdateManyWithoutVendorNestedInput = {
   deleteMany?: Prisma.BidScalarWhereInput | Prisma.BidScalarWhereInput[]
 }
 
+export type BidCreateWithoutColumn_mappingsInput = {
+  bid_number: string
+  status?: string
+  outcome?: string | null
+  received_date: Date | string
+  due_date: Date | string
+  submitted_date?: Date | string | null
+  notes?: string | null
+  margin_percent?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  transport_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  headers?: Prisma.BidCreateheadersInput | string[]
+  created_at: Date | string
+  vendor: Prisma.OrganizationCreateNestedOneWithoutBidsInput
+  created_by: Prisma.UserCreateNestedOneWithoutBids_createdInput
+  rows?: Prisma.BidRowCreateNestedManyWithoutBidInput
+}
+
+export type BidUncheckedCreateWithoutColumn_mappingsInput = {
+  id?: number
+  bid_number: string
+  status?: string
+  outcome?: string | null
+  vendor_id: number
+  received_date: Date | string
+  due_date: Date | string
+  submitted_date?: Date | string | null
+  notes?: string | null
+  margin_percent?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  transport_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  headers?: Prisma.BidCreateheadersInput | string[]
+  created_by_id: number
+  created_at: Date | string
+  rows?: Prisma.BidRowUncheckedCreateNestedManyWithoutBidInput
+}
+
+export type BidCreateOrConnectWithoutColumn_mappingsInput = {
+  where: Prisma.BidWhereUniqueInput
+  create: Prisma.XOR<Prisma.BidCreateWithoutColumn_mappingsInput, Prisma.BidUncheckedCreateWithoutColumn_mappingsInput>
+}
+
+export type BidUpsertWithoutColumn_mappingsInput = {
+  update: Prisma.XOR<Prisma.BidUpdateWithoutColumn_mappingsInput, Prisma.BidUncheckedUpdateWithoutColumn_mappingsInput>
+  create: Prisma.XOR<Prisma.BidCreateWithoutColumn_mappingsInput, Prisma.BidUncheckedCreateWithoutColumn_mappingsInput>
+  where?: Prisma.BidWhereInput
+}
+
+export type BidUpdateToOneWithWhereWithoutColumn_mappingsInput = {
+  where?: Prisma.BidWhereInput
+  data: Prisma.XOR<Prisma.BidUpdateWithoutColumn_mappingsInput, Prisma.BidUncheckedUpdateWithoutColumn_mappingsInput>
+}
+
+export type BidUpdateWithoutColumn_mappingsInput = {
+  bid_number?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  outcome?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  received_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  due_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  submitted_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  margin_percent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  transport_cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  headers?: Prisma.BidUpdateheadersInput | string[]
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  vendor?: Prisma.OrganizationUpdateOneRequiredWithoutBidsNestedInput
+  created_by?: Prisma.UserUpdateOneRequiredWithoutBids_createdNestedInput
+  rows?: Prisma.BidRowUpdateManyWithoutBidNestedInput
+}
+
+export type BidUncheckedUpdateWithoutColumn_mappingsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  bid_number?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  outcome?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  vendor_id?: Prisma.IntFieldUpdateOperationsInput | number
+  received_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  due_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  submitted_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  margin_percent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  transport_cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  headers?: Prisma.BidUpdateheadersInput | string[]
+  created_by_id?: Prisma.IntFieldUpdateOperationsInput | number
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  rows?: Prisma.BidRowUncheckedUpdateManyWithoutBidNestedInput
+}
+
 export type BidCreateWithoutRowsInput = {
   bid_number: string
   status?: string
@@ -717,6 +824,7 @@ export type BidCreateWithoutRowsInput = {
   created_at: Date | string
   vendor: Prisma.OrganizationCreateNestedOneWithoutBidsInput
   created_by: Prisma.UserCreateNestedOneWithoutBids_createdInput
+  column_mappings?: Prisma.BidColumnMappingCreateNestedManyWithoutBidInput
 }
 
 export type BidUncheckedCreateWithoutRowsInput = {
@@ -734,6 +842,7 @@ export type BidUncheckedCreateWithoutRowsInput = {
   headers?: Prisma.BidCreateheadersInput | string[]
   created_by_id: number
   created_at: Date | string
+  column_mappings?: Prisma.BidColumnMappingUncheckedCreateNestedManyWithoutBidInput
 }
 
 export type BidCreateOrConnectWithoutRowsInput = {
@@ -766,6 +875,7 @@ export type BidUpdateWithoutRowsInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   vendor?: Prisma.OrganizationUpdateOneRequiredWithoutBidsNestedInput
   created_by?: Prisma.UserUpdateOneRequiredWithoutBids_createdNestedInput
+  column_mappings?: Prisma.BidColumnMappingUpdateManyWithoutBidNestedInput
 }
 
 export type BidUncheckedUpdateWithoutRowsInput = {
@@ -783,6 +893,7 @@ export type BidUncheckedUpdateWithoutRowsInput = {
   headers?: Prisma.BidUpdateheadersInput | string[]
   created_by_id?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  column_mappings?: Prisma.BidColumnMappingUncheckedUpdateManyWithoutBidNestedInput
 }
 
 export type BidCreateWithoutCreated_byInput = {
@@ -799,6 +910,7 @@ export type BidCreateWithoutCreated_byInput = {
   created_at: Date | string
   vendor: Prisma.OrganizationCreateNestedOneWithoutBidsInput
   rows?: Prisma.BidRowCreateNestedManyWithoutBidInput
+  column_mappings?: Prisma.BidColumnMappingCreateNestedManyWithoutBidInput
 }
 
 export type BidUncheckedCreateWithoutCreated_byInput = {
@@ -816,6 +928,7 @@ export type BidUncheckedCreateWithoutCreated_byInput = {
   headers?: Prisma.BidCreateheadersInput | string[]
   created_at: Date | string
   rows?: Prisma.BidRowUncheckedCreateNestedManyWithoutBidInput
+  column_mappings?: Prisma.BidColumnMappingUncheckedCreateNestedManyWithoutBidInput
 }
 
 export type BidCreateOrConnectWithoutCreated_byInput = {
@@ -878,6 +991,7 @@ export type BidCreateWithoutVendorInput = {
   created_at: Date | string
   created_by: Prisma.UserCreateNestedOneWithoutBids_createdInput
   rows?: Prisma.BidRowCreateNestedManyWithoutBidInput
+  column_mappings?: Prisma.BidColumnMappingCreateNestedManyWithoutBidInput
 }
 
 export type BidUncheckedCreateWithoutVendorInput = {
@@ -895,6 +1009,7 @@ export type BidUncheckedCreateWithoutVendorInput = {
   created_by_id: number
   created_at: Date | string
   rows?: Prisma.BidRowUncheckedCreateNestedManyWithoutBidInput
+  column_mappings?: Prisma.BidColumnMappingUncheckedCreateNestedManyWithoutBidInput
 }
 
 export type BidCreateOrConnectWithoutVendorInput = {
@@ -953,6 +1068,7 @@ export type BidUpdateWithoutCreated_byInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   vendor?: Prisma.OrganizationUpdateOneRequiredWithoutBidsNestedInput
   rows?: Prisma.BidRowUpdateManyWithoutBidNestedInput
+  column_mappings?: Prisma.BidColumnMappingUpdateManyWithoutBidNestedInput
 }
 
 export type BidUncheckedUpdateWithoutCreated_byInput = {
@@ -970,6 +1086,7 @@ export type BidUncheckedUpdateWithoutCreated_byInput = {
   headers?: Prisma.BidUpdateheadersInput | string[]
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rows?: Prisma.BidRowUncheckedUpdateManyWithoutBidNestedInput
+  column_mappings?: Prisma.BidColumnMappingUncheckedUpdateManyWithoutBidNestedInput
 }
 
 export type BidUncheckedUpdateManyWithoutCreated_byInput = {
@@ -1018,6 +1135,7 @@ export type BidUpdateWithoutVendorInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   created_by?: Prisma.UserUpdateOneRequiredWithoutBids_createdNestedInput
   rows?: Prisma.BidRowUpdateManyWithoutBidNestedInput
+  column_mappings?: Prisma.BidColumnMappingUpdateManyWithoutBidNestedInput
 }
 
 export type BidUncheckedUpdateWithoutVendorInput = {
@@ -1035,6 +1153,7 @@ export type BidUncheckedUpdateWithoutVendorInput = {
   created_by_id?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rows?: Prisma.BidRowUncheckedUpdateManyWithoutBidNestedInput
+  column_mappings?: Prisma.BidColumnMappingUncheckedUpdateManyWithoutBidNestedInput
 }
 
 export type BidUncheckedUpdateManyWithoutVendorInput = {
@@ -1060,10 +1179,12 @@ export type BidUncheckedUpdateManyWithoutVendorInput = {
 
 export type BidCountOutputType = {
   rows: number
+  column_mappings: number
 }
 
 export type BidCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   rows?: boolean | BidCountOutputTypeCountRowsArgs
+  column_mappings?: boolean | BidCountOutputTypeCountColumn_mappingsArgs
 }
 
 /**
@@ -1081,6 +1202,13 @@ export type BidCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensio
  */
 export type BidCountOutputTypeCountRowsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.BidRowWhereInput
+}
+
+/**
+ * BidCountOutputType without action
+ */
+export type BidCountOutputTypeCountColumn_mappingsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.BidColumnMappingWhereInput
 }
 
 
@@ -1102,6 +1230,7 @@ export type BidSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = ru
   vendor?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
   created_by?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   rows?: boolean | Prisma.Bid$rowsArgs<ExtArgs>
+  column_mappings?: boolean | Prisma.Bid$column_mappingsArgs<ExtArgs>
   _count?: boolean | Prisma.BidCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["bid"]>
 
@@ -1165,6 +1294,7 @@ export type BidInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   vendor?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
   created_by?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   rows?: boolean | Prisma.Bid$rowsArgs<ExtArgs>
+  column_mappings?: boolean | Prisma.Bid$column_mappingsArgs<ExtArgs>
   _count?: boolean | Prisma.BidCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type BidIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1182,6 +1312,7 @@ export type $BidPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
     vendor: Prisma.$OrganizationPayload<ExtArgs>
     created_by: Prisma.$UserPayload<ExtArgs>
     rows: Prisma.$BidRowPayload<ExtArgs>[]
+    column_mappings: Prisma.$BidColumnMappingPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -1595,6 +1726,7 @@ export interface Prisma__BidClient<T, Null = never, ExtArgs extends runtime.Type
   vendor<T extends Prisma.OrganizationDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.OrganizationDefaultArgs<ExtArgs>>): Prisma.Prisma__OrganizationClient<runtime.Types.Result.GetResult<Prisma.$OrganizationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   created_by<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   rows<T extends Prisma.Bid$rowsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Bid$rowsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BidRowPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  column_mappings<T extends Prisma.Bid$column_mappingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Bid$column_mappingsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BidColumnMappingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2060,6 +2192,30 @@ export type Bid$rowsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   take?: number
   skip?: number
   distinct?: Prisma.BidRowScalarFieldEnum | Prisma.BidRowScalarFieldEnum[]
+}
+
+/**
+ * Bid.column_mappings
+ */
+export type Bid$column_mappingsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the BidColumnMapping
+   */
+  select?: Prisma.BidColumnMappingSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the BidColumnMapping
+   */
+  omit?: Prisma.BidColumnMappingOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.BidColumnMappingInclude<ExtArgs> | null
+  where?: Prisma.BidColumnMappingWhereInput
+  orderBy?: Prisma.BidColumnMappingOrderByWithRelationInput | Prisma.BidColumnMappingOrderByWithRelationInput[]
+  cursor?: Prisma.BidColumnMappingWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.BidColumnMappingScalarFieldEnum | Prisma.BidColumnMappingScalarFieldEnum[]
 }
 
 /**

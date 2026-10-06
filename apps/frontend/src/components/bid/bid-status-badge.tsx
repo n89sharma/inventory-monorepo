@@ -1,5 +1,6 @@
 import { Badge } from '@/components/shadcn/badge'
 import { formatTitleCase } from '@/lib/formatters'
+import { WarningIcon } from '@phosphor-icons/react'
 import { BID_OUTCOME, BID_STATUS } from 'shared-types'
 
 const BADGE_VARIANT_BY_STATUS = {
@@ -22,4 +23,13 @@ export function BidStatusBadge({ status }: { status: string }) {
 export function BidOutcomeBadge({ outcome }: { outcome: string }) {
   const variant = BADGE_VARIANT_BY_OUTCOME[outcome as keyof typeof BADGE_VARIANT_BY_OUTCOME]
   return <Badge variant={variant ?? 'secondary'}>{formatTitleCase(outcome)}</Badge>
+}
+
+export function BidWarningBadge({ label }: { label: string }) {
+  return (
+    <Badge variant="warning">
+      <WarningIcon aria-hidden="true" />
+      {label}
+    </Badge>
+  )
 }

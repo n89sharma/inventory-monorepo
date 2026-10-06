@@ -21,6 +21,23 @@ export const BidOutcomeSchema = z.enum(['WON', 'LOST'])
 export type BidOutcome = z.infer<typeof BidOutcomeSchema>
 export const BID_OUTCOME = BidOutcomeSchema.enum
 
+export const BidColumnRoleSchema = z.enum([
+  'BRAND',
+  'MODEL',
+  'SERIAL',
+  'TOTAL_METER',
+  'ACCESSORIES',
+  'NOTES',
+])
+export type BidColumnRole = z.infer<typeof BidColumnRoleSchema>
+export const BID_COLUMN_ROLE = BidColumnRoleSchema.enum
+
+export const BidColumnMappingSchema = z.object({
+  column_index: z.number().int().nonnegative(),
+  role: BidColumnRoleSchema,
+})
+export type BidColumnMapping = z.infer<typeof BidColumnMappingSchema>
+
 export const BidSummarySchema = z.object({
   bid_number: z.string(),
   status: z.string(),
@@ -66,6 +83,7 @@ export const BidDetailSchema = BidSummarySchema.extend({
   transport_cost: z.number(),
   headers: z.array(z.string()),
   rows: z.array(BidRowSchema),
+  column_mappings: z.array(BidColumnMappingSchema),
   totals: BidTotalsSchema,
 })
 export type BidDetail = z.infer<typeof BidDetailSchema>
@@ -102,9 +120,14 @@ export const CreateBidSchema = BidMetadataSchema.extend({
 })
 export type CreateBid = z.infer<typeof CreateBidSchema>
 
+const BidRowIdsSchema = z.array(z.number().int()).nonempty().max(BID_UPLOAD_LIMITS.rows)
+
+export const RemoveBidRowsSchema = z.object({ row_ids: BidRowIdsSchema })
+export type RemoveBidRows = z.infer<typeof RemoveBidRowsSchema>
+
 export const UpdateBidRowsSchema = z
   .object({
-    row_ids: z.array(z.number().int()).nonempty().max(BID_UPLOAD_LIMITS.rows),
+    row_ids: BidRowIdsSchema,
     selling_price: z.number().nonnegative().nullable().optional(),
     transport_cost: z.number().nonnegative().nullable().optional(),
     margin_percent: BidMarginPercentSchema.nullable().optional(),
@@ -119,6 +142,19 @@ export const UpdateBidRowsSchema = z
     { message: 'Nothing to update' },
   )
 export type UpdateBidRows = z.infer<typeof UpdateBidRowsSchema>
+
+export const UpdateBidColumnMappingsSchema = z
+  .object({ mappings: z.array(BidColumnMappingSchema).max(BidColumnRoleSchema.options.length) })
+  .refine(
+    (data) => new Set(data.mappings.map((mapping) => mapping.role)).size === data.mappings.length,
+    { message: 'Each column type can be used once' },
+  )
+  .refine(
+    (data) =>
+      new Set(data.mappings.map((mapping) => mapping.column_index)).size === data.mappings.length,
+    { message: 'Each column can be mapped once' },
+  )
+export type UpdateBidColumnMappings = z.infer<typeof UpdateBidColumnMappingsSchema>
 
 export const ConcludeBidSchema = z.object({ outcome: BidOutcomeSchema })
 export type ConcludeBid = z.infer<typeof ConcludeBidSchema>

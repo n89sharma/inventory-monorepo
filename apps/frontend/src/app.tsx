@@ -20,11 +20,6 @@ const BidsSummaryPage = lazy(() =>
     default: m.BidsSummaryPage,
   })),
 )
-const CreateBidPage = lazy(() =>
-  import('./components/bid/create-bid-page').then((m) => ({
-    default: m.CreateBidPage,
-  })),
-)
 const BidDetailsPage = lazy(() =>
   import('./components/bid/bid-details-page').then((m) => ({
     default: m.BidDetailsPage,
@@ -246,14 +241,6 @@ function AppRoutes() {
                       element={
                         <PermissionRoute permission="create_update_purchase_bids">
                           <BidsSummaryPage />
-                        </PermissionRoute>
-                      }
-                    />
-                    <Route
-                      path="/bids/new"
-                      element={
-                        <PermissionRoute permission="create_update_purchase_bids">
-                          <CreateBidPage />
                         </PermissionRoute>
                       }
                     />

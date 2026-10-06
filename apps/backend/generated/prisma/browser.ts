@@ -138,6 +138,11 @@ export type AssetTransfer = Prisma.AssetTransferModel
  */
 export type Bid = Prisma.BidModel
 /**
+ * Model BidColumnMapping
+ * 
+ */
+export type BidColumnMapping = Prisma.BidColumnMappingModel
+/**
  * Model BidRow
  * 
  */

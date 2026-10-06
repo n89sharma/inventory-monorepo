@@ -2,16 +2,9 @@ import { ConcludeBidDialog } from '@/components/bid/conclude-bid-dialog'
 import { LifecycleButton } from '@/components/shared/lifecycle-button'
 import { BID_STATUS, type BidOutcome } from 'shared-types'
 
-function reviewBlockedLabel(rowCount: number, unpricedCount: number): string {
-  if (rowCount === 0) return ' (no rows)'
-  if (unpricedCount > 0) return ` (${unpricedCount} unpriced)`
-  return ''
-}
-
 type BidLifecycleActionsProps = {
   status: string
-  rowCount: number
-  unpricedCount: number
+  reviewBlockedReason: string | null
   onReview: () => Promise<void>
   onReturnToDraft: () => Promise<void>
   onSubmit: () => Promise<void>
@@ -20,22 +13,20 @@ type BidLifecycleActionsProps = {
 
 export function BidLifecycleActions({
   status,
-  rowCount,
-  unpricedCount,
+  reviewBlockedReason,
   onReview,
   onReturnToDraft,
   onSubmit,
   onConclude,
 }: BidLifecycleActionsProps): React.JSX.Element | null {
   if (status === BID_STATUS.DRAFT) {
-    const blockedLabel = reviewBlockedLabel(rowCount, unpricedCount)
     return (
       <LifecycleButton
-        label={`Review${blockedLabel}`}
+        label="Review"
         title="Send this bid for review?"
         description="Rows and pricing are locked until the bid is sent back to draft"
         onConfirm={onReview}
-        disabled={blockedLabel !== ''}
+        disabledReason={reviewBlockedReason}
       />
     )
   }

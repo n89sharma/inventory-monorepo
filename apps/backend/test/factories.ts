@@ -629,6 +629,7 @@ export async function setAssetStatus(assetId: number, status: string): Promise<v
 }
 
 export async function cleanupTransactionalData(): Promise<void> {
+  await prisma.bidColumnMapping.deleteMany()
   await prisma.bidRow.deleteMany()
   await prisma.bid.deleteMany()
   await prisma.monthEndReport.deleteMany()

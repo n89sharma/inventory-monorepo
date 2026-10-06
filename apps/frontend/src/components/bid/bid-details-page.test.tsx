@@ -1,8 +1,9 @@
 import type * as DataTableModule from '@/components/shared/data-table'
-import { render, screen } from '@testing-library/react'
+import { TooltipProvider } from '@/components/shadcn/tooltip'
+import { fireEvent, render, screen } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { NuqsTestingAdapter } from 'nuqs/adapters/testing'
-import { BID_STATUS, type BidDetail } from 'shared-types'
+import { BID_COLUMN_ROLE, BID_STATUS, type BidDetail } from 'shared-types'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { BidDetailsPage } from './bid-details-page'
 
@@ -21,12 +22,17 @@ vi.mock('@/components/shared/data-table', async (importOriginal) => {
   return { ...actual, DataGridWithoutResultCount: actual.DataTable }
 })
 
+const removeRows = vi.hoisted(() => vi.fn())
+
 vi.mock('@/hooks/use-bid-mutations', () => ({
   useBidMutations: () => ({
+    removeRows,
+    flushPending: vi.fn(),
     remove: vi.fn(),
     updateMetadata: vi.fn(),
     upload: vi.fn(),
     updateRows: vi.fn(),
+    mapColumns: vi.fn(),
     setNoBid: vi.fn(),
     review: vi.fn(),
     returnToDraft: vi.fn(),
@@ -74,12 +80,13 @@ function makeBid(status: string): BidDetail {
         margin_amount: 200,
       },
     ],
+    column_mappings: [],
     totals: { total_cost: 800, expected_sale: 1000, expected_margin: 200, unpriced_count: 0 },
   }
 }
 
-function renderPage(status: string) {
-  detail.data = makeBid(status)
+function renderPage(status: string, overrides: Partial<BidDetail> = {}) {
+  detail.data = { ...makeBid(status), ...overrides }
   render(
     <NuqsTestingAdapter>
       <MemoryRouter initialEntries={[`/bids/${BID_NUMBER}`]}>
@@ -88,6 +95,7 @@ function renderPage(status: string) {
         </Routes>
       </MemoryRouter>
     </NuqsTestingAdapter>,
+    { wrapper: TooltipProvider },
   )
 }
 
@@ -102,6 +110,45 @@ describe('BidDetailsPage', () => {
     expect(screen.getByRole('button', { name: 'Selling Price for row 1' })).toBeInTheDocument()
     expect(screen.getByRole('checkbox', { name: 'No Bid for row 1' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Margin % for row 1' })).toHaveTextContent('20%')
+  })
+
+  it('removes the selected rows from the bulk bar', () => {
+    renderPage(BID_STATUS.DRAFT)
+    fireEvent.click(screen.getByRole('checkbox', { name: 'Select row' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Remove' }))
+    expect(removeRows).toHaveBeenCalledWith(BID_NUMBER, [11])
+  })
+
+  it('offers Map Columns on a draft with rows', () => {
+    renderPage(BID_STATUS.DRAFT)
+    expect(screen.getByRole('button', { name: 'Map Columns' })).toBeInTheDocument()
+  })
+
+  it('hides Map Columns on a draft with no rows', () => {
+    renderPage(BID_STATUS.DRAFT, { rows: [] })
+    expect(screen.queryByRole('button', { name: 'Map Columns' })).not.toBeInTheDocument()
+  })
+
+  it('hides Map Columns outside draft', () => {
+    renderPage(BID_STATUS.REVIEW)
+    expect(screen.queryByRole('button', { name: 'Map Columns' })).not.toBeInTheDocument()
+  })
+
+  it('shows a manually mapped column green under its standard name', () => {
+    renderPage(BID_STATUS.DRAFT, {
+      column_mappings: [{ column_index: 1, role: BID_COLUMN_ROLE.NOTES }],
+    })
+    expect(screen.getByRole('columnheader', { name: /^Notes/ })).toHaveClass('bg-emerald-100')
+  })
+
+  it('shows the Total Meter in thousands', () => {
+    const [row] = makeBid(BID_STATUS.DRAFT).rows
+    if (row === undefined) throw new Error('Expected a row')
+    renderPage(BID_STATUS.DRAFT, {
+      headers: ['Serial', 'Total Meter'],
+      rows: [{ ...row, cells: ['S1', '191,346'] }],
+    })
+    expect(screen.getByRole('cell', { name: '191 K' })).toBeInTheDocument()
   })
 
   it('locks the rows once the bid is in review', () => {
@@ -152,5 +199,23 @@ describe('BidDetailsPage', () => {
   it('shows the totals from the server', () => {
     renderPage(BID_STATUS.DRAFT)
     expect(screen.getByText('Expected Margin').parentElement).toHaveTextContent('$200.00')
+  })
+
+  it('warns beside the status while rows are unpriced and keeps the Review label plain', () => {
+    const totals = { total_cost: 0, expected_sale: 0, expected_margin: 0, unpriced_count: 8 }
+    renderPage(BID_STATUS.DRAFT, { totals })
+    expect(screen.getByText('8 unpriced')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Review' })).toBeDisabled()
+  })
+
+  it('warns when a draft has no rows', () => {
+    renderPage(BID_STATUS.DRAFT, { rows: [] })
+    expect(screen.getByText('No rows')).toBeInTheDocument()
+  })
+
+  it('shows no warning on a fully priced draft', () => {
+    renderPage(BID_STATUS.DRAFT)
+    expect(screen.queryByText(/unpriced|No rows/)).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Review' })).toBeEnabled()
   })
 })

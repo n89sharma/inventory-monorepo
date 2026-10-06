@@ -1,14 +1,16 @@
+import { labelBidColumns, parseBidMeterReading } from '@/lib/bid-column-labels'
 import type { CsvColumn } from '@/lib/csv'
-import type { BidDetail, BidRow } from 'shared-types'
+import { BID_COLUMN_ROLE, type BidDetail, type BidRow } from 'shared-types'
 
 const NO_BID_EXPORT_VALUE = 'Yes'
 
-function amountText(value: number | null): string {
-  return value === null ? '' : value.toFixed(2)
+function meterText(text: string): string {
+  const reading = parseBidMeterReading(text)
+  return reading === null ? text : String(reading)
 }
 
-function pastedHeader(header: string, index: number): string {
-  return header === '' ? `Column ${index + 1}` : header
+function amountText(value: number | null): string {
+  return value === null ? '' : value.toFixed(2)
 }
 
 const PRICING_CSV_COLUMNS: CsvColumn<BidRow>[] = [
@@ -21,10 +23,13 @@ const PRICING_CSV_COLUMNS: CsvColumn<BidRow>[] = [
 ]
 
 export function bidCsvColumns(bid: BidDetail): CsvColumn<BidRow>[] {
-  const pasted = bid.headers.map((header, index) => ({
-    header: pastedHeader(header, index),
-    value: (row: BidRow) => row.cells[index] ?? '',
-  }))
+  const pasted = labelBidColumns(bid).map((column) => {
+    const cellText = (row: BidRow) => row.cells[column.index] ?? ''
+    if (column.role === BID_COLUMN_ROLE.TOTAL_METER) {
+      return { header: column.label, value: (row: BidRow) => meterText(cellText(row)) }
+    }
+    return { header: column.label, value: cellText }
+  })
   return [...pasted, ...PRICING_CSV_COLUMNS]
 }
 

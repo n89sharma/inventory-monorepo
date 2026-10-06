@@ -1,5 +1,8 @@
 import {
   BID_STATUS,
+  BidColumnRoleSchema,
+  classifyBidColumns,
+  type BidColumnMapping,
   type BidMetadata,
   type CreateBid,
   type BidDetail,
@@ -7,6 +10,8 @@ import {
   type BidRow as BidRowDto,
   type BidStatus,
   type BidSummary,
+  type RemoveBidRows,
+  type UpdateBidColumnMappings,
   type UpdateBidRows,
   type UploadBidRows,
 } from 'shared-types'
@@ -33,10 +38,18 @@ const NOT_IN_REVIEW_MESSAGE = 'Only bids in review can be sent back or submitted
 const NOT_SUBMITTED_MESSAGE = 'Only submitted bids can be concluded'
 const NO_ROWS_MESSAGE = 'Upload rows before review'
 const ROW_NOT_ON_BID_MESSAGE = 'Row not on this bid'
+const COLUMN_NOT_ON_BID_MESSAGE = 'Column not on this bid'
+const COLUMN_ALREADY_RECOGNISED_MESSAGE = 'Column already recognised'
 
 type Tx = Prisma.TransactionClient
 
 const BID_ROW_ORDER = { position: 'asc' } as const
+const COLUMN_MAPPING_ORDER = { column_index: 'asc' } as const
+const COLUMN_MAPPING_SELECT = { column_index: true, role: true } as const
+
+function toColumnMappingDto(mapping: { column_index: number; role: string }): BidColumnMapping {
+  return { column_index: mapping.column_index, role: BidColumnRoleSchema.parse(mapping.role) }
+}
 
 async function getNewBidNumber(): Promise<string> {
   const sequence = await getNextSequence('bid')
@@ -165,6 +178,7 @@ export async function getBid(bidNumber: string): Promise<BidDetail> {
       vendor: { select: { id: true, account_number: true, name: true } },
       created_by: { select: { name: true } },
       rows: { orderBy: BID_ROW_ORDER },
+      column_mappings: { select: COLUMN_MAPPING_SELECT, orderBy: COLUMN_MAPPING_ORDER },
     },
   })
   if (!bid) throw notFound(bidNumber)
@@ -186,6 +200,7 @@ export async function getBid(bidNumber: string): Promise<BidDetail> {
     transport_cost: bid.transport_cost.toNumber(),
     headers: bid.headers,
     rows: bid.rows.map((row) => toBidRowDto(row, bid)),
+    column_mappings: bid.column_mappings.map(toColumnMappingDto),
     totals,
   }
 }
@@ -250,6 +265,7 @@ export async function updateBidMetadata(bidNumber: string, metadata: BidMetadata
 export async function deleteBid(bidNumber: string): Promise<void> {
   await prisma.$transaction(async (tx) => {
     const bidId = await lockDraftBid(tx, bidNumber)
+    await tx.bidColumnMapping.deleteMany({ where: { bid_id: bidId } })
     await tx.bidRow.deleteMany({ where: { bid_id: bidId } })
     await tx.bid.delete({ where: { id: bidId } })
   })
@@ -258,6 +274,7 @@ export async function deleteBid(bidNumber: string): Promise<void> {
 export async function uploadBidRows(bidNumber: string, upload: UploadBidRows): Promise<BidDetail> {
   await prisma.$transaction(async (tx) => {
     const bidId = await lockDraftBid(tx, bidNumber)
+    await tx.bidColumnMapping.deleteMany({ where: { bid_id: bidId } })
     await tx.bidRow.deleteMany({ where: { bid_id: bidId } })
     await tx.bid.update({ where: { id: bidId }, data: { headers: upload.headers } })
     await tx.bidRow.createMany({
@@ -283,6 +300,49 @@ function mergePricingInput(row: BidRowPricingInput, update: UpdateBidRows): BidR
         : toDecimalOrNull(update.margin_percent),
     zero_priced: update.zero_priced ?? row.zero_priced,
   }
+}
+
+export async function updateBidColumnMappings(
+  bidNumber: string,
+  update: UpdateBidColumnMappings,
+): Promise<BidDetail> {
+  await prisma.$transaction(async (tx) => {
+    const bidId = await lockDraftBid(tx, bidNumber)
+    const bid = await tx.bid.findUniqueOrThrow({
+      where: { id: bidId },
+      select: { headers: true, column_mappings: { select: COLUMN_MAPPING_SELECT } },
+    })
+    if (update.mappings.some((mapping) => mapping.column_index >= bid.headers.length)) {
+      throw new ValidationError(COLUMN_NOT_ON_BID_MESSAGE)
+    }
+    const automatic = classifyBidColumns(
+      bid.headers,
+      bid.column_mappings.map(toColumnMappingDto),
+    ).filter((column) => column.source === 'automatic')
+    const automaticIndexes = new Set(automatic.map((column) => column.index))
+    const automaticRoles = new Set(automatic.map((column) => column.role))
+    const clashes = update.mappings.some(
+      (mapping) => automaticIndexes.has(mapping.column_index) || automaticRoles.has(mapping.role),
+    )
+    if (clashes) throw new ValidationError(COLUMN_ALREADY_RECOGNISED_MESSAGE)
+    await tx.bidColumnMapping.deleteMany({ where: { bid_id: bidId } })
+    await tx.bidColumnMapping.createMany({
+      data: update.mappings.map((mapping) => ({ bid_id: bidId, ...mapping })),
+    })
+  })
+  return getBid(bidNumber)
+}
+
+export async function removeBidRows(bidNumber: string, removal: RemoveBidRows): Promise<void> {
+  await prisma.$transaction(async (tx) => {
+    const bidId = await lockDraftBid(tx, bidNumber)
+    const { count } = await tx.bidRow.deleteMany({
+      where: { bid_id: bidId, id: { in: removal.row_ids } },
+    })
+    if (count !== new Set(removal.row_ids).size) {
+      throw new ValidationError(ROW_NOT_ON_BID_MESSAGE)
+    }
+  })
 }
 
 export async function updateBidRows(bidNumber: string, update: UpdateBidRows): Promise<BidDetail> {

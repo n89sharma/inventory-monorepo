@@ -1,6 +1,7 @@
 import { Checkbox } from '@/components/shadcn/checkbox'
 import { Field, FieldLabel } from '@/components/shadcn/field'
 import { Textarea } from '@/components/shadcn/textarea'
+import type { BidPasteResult } from '@/lib/bid-paste'
 import { useId } from 'react'
 
 interface BidSheetPasteFieldsProps {
@@ -35,5 +36,25 @@ export function BidSheetPasteFields({
         <FieldLabel htmlFor={headerCheckboxId}>First row is headers</FieldLabel>
       </Field>
     </>
+  )
+}
+
+function countLabel(count: number, noun: string): string {
+  return `${count} ${noun}${count === 1 ? '' : 's'}`
+}
+
+export function BidSheetPasteStatus({ result }: { result: BidPasteResult }): React.JSX.Element {
+  if (!result.ok) {
+    return (
+      <p role="alert" className="text-destructive text-sm">
+        {result.error}
+      </p>
+    )
+  }
+  return (
+    <p className="text-muted-foreground text-sm">
+      {countLabel(result.upload.rows.length, 'row')},{' '}
+      {countLabel(result.upload.headers.length, 'column')}
+    </p>
   )
 }

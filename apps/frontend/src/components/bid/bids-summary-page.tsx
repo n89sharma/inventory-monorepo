@@ -1,4 +1,5 @@
 import { BID_TEXT_SEARCH_COLUMN_IDS, bidTableColumns } from '@/components/bid/bid-columns'
+import { CreateBidModal } from '@/components/bid/create-bid-modal'
 import { TableTextFilter } from '@/components/shared/filters/table-text-filter'
 import { preloadBidDetail, useBidsList } from '@/hooks/use-bid'
 import { useOrgs } from '@/hooks/use-org'
@@ -8,8 +9,8 @@ import { collectionDetailHref } from '@/ui-types/navigation-context'
 import { PlusIcon } from '@phosphor-icons/react'
 import type { TableOptions } from '@tanstack/react-table'
 import { useOptimisticSearchParams } from 'nuqs/adapters/react-router/v7'
-import { useCallback, useMemo } from 'react'
-import { Link } from 'react-router-dom'
+import { useCallback, useMemo, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import type { BidSummary } from 'shared-types'
 import { CollectionPage } from '../collections/collection-page'
 import { Button } from '../shadcn/button'
@@ -71,14 +72,27 @@ export function BidsSummaryPage(): React.JSX.Element {
           />
         </SearchBar>
       }
-      actions={
-        <Button asChild>
-          <Link to="/bids/new">
-            <PlusIcon />
-            New Bid
-          </Link>
-        </Button>
-      }
+      actions={<NewBidAction />}
     />
+  )
+}
+
+function NewBidAction(): React.JSX.Element {
+  const [createOpen, setCreateOpen] = useState(false)
+  const navigate = useNavigate()
+  const searchParams = useOptimisticSearchParams()
+
+  return (
+    <>
+      <Button onClick={() => setCreateOpen(true)}>
+        <PlusIcon />
+        New Bid
+      </Button>
+      <CreateBidModal
+        open={createOpen}
+        onOpenChange={setCreateOpen}
+        onCreated={(bidNumber) => navigate(collectionDetailHref('bids', bidNumber, searchParams))}
+      />
+    </>
   )
 }

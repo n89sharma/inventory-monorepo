@@ -6,6 +6,8 @@ import {
   BidMetadataSchema,
   CreateBidSchema,
   ConcludeBidSchema,
+  RemoveBidRowsSchema,
+  UpdateBidColumnMappingsSchema,
   UpdateBidRowsSchema,
   UploadBidRowsSchema,
   successResponse,
@@ -19,9 +21,11 @@ import {
   deleteBid as deleteBidSer,
   getBid as getBidSer,
   getBidSummaries as getBidSummariesSer,
+  removeBidRows as removeBidRowsSer,
   returnBidToDraft as returnBidToDraftSer,
   reviewBid as reviewBidSer,
   submitBid as submitBidSer,
+  updateBidColumnMappings as updateBidColumnMappingsSer,
   updateBidMetadata as updateBidMetadataSer,
   updateBidRows as updateBidRowsSer,
   uploadBidRows as uploadBidRowsSer,
@@ -66,6 +70,20 @@ export const uploadBidRows = asyncHandler(
     res.json(successResponse(bid))
   },
 )
+
+export const patchBidColumns = asyncHandler(
+  async (req: Request, res: Response<ApiResponse<BidDetail>>) => {
+    const update = UpdateBidColumnMappingsSchema.parse(req.body)
+    const bid = await updateBidColumnMappingsSer(req.params.bidNumber, update)
+    res.json(successResponse(bid))
+  },
+)
+
+export const removeBidRows = asyncHandler(async (req, res) => {
+  const removal = RemoveBidRowsSchema.parse(req.body)
+  await removeBidRowsSer(req.params.bidNumber, removal)
+  res.status(204).send()
+})
 
 export const patchBidRows = asyncHandler(
   async (req: Request, res: Response<ApiResponse<BidDetail>>) => {

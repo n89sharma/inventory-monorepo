@@ -1,5 +1,6 @@
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
 import {
+  BID_COLUMN_ROLE,
   BID_OUTCOME,
   BID_STATUS,
   DEFAULT_BID_MARGIN_PERCENT,
@@ -13,15 +14,18 @@ import {
 } from '../../test/factories.js'
 import { todayYmd } from '../lib/date-only.js'
 import { ConflictError, NotFoundError, ValidationError } from '../lib/errors.js'
+import { prisma } from '../prisma.js'
 import {
   concludeBid,
   createBid,
   deleteBid,
   getBid,
   getBidSummaries,
+  removeBidRows,
   returnBidToDraft,
   reviewBid,
   submitBid,
+  updateBidColumnMappings,
   updateBidMetadata,
   updateBidRows,
   uploadBidRows,
@@ -35,6 +39,12 @@ const THREE_ROWS: [string[], ...string[][]] = [
   ['S2', 'C3000'],
   ['S3', 'C4500'],
 ]
+
+const VENDOR_HEADERS: [string, ...string[]] = ['Brand', 'Models', 'Serial', 'Mileage']
+const VENDOR_ROWS: [string[], ...string[][]] = [['Canon', 'C3000', 'S1', '120000']]
+const BRAND_COLUMN = 0
+const MODELS_COLUMN = 1
+const MILEAGE_COLUMN = 3
 
 let seed: ArrivalTestData
 
@@ -57,6 +67,13 @@ async function createBidWithRows(): Promise<{ bidNumber: string; rowIds: [number
   const [first, ...rest] = detail.rows.map((row) => row.id)
   if (first === undefined) throw new Error('Expected uploaded rows')
   return { bidNumber, rowIds: [first, ...rest] }
+}
+
+async function createVendorSheetBid(): Promise<string> {
+  return createBid(
+    buildCreateBidInput({ sheet: { headers: VENDOR_HEADERS, rows: VENDOR_ROWS } }),
+    seed.userId,
+  )
 }
 
 async function priceEveryRow(bidNumber: string, rowIds: [number, ...number[]]): Promise<void> {
@@ -265,6 +282,131 @@ describe('bidService', () => {
     ).rejects.toThrow(ValidationError)
   })
 
+  it('removes the selected rows and keeps the rest in order', async () => {
+    const { bidNumber, rowIds } = await createBidWithRows()
+    const [, secondRowId] = rowIds
+    if (secondRowId === undefined) throw new Error('Expected a second row')
+
+    await removeBidRows(bidNumber, { row_ids: [secondRowId] })
+
+    const detail = await getBid(bidNumber)
+    expect(detail.rows.map((row) => row.cells)).toEqual([
+      ['S1', 'C3000'],
+      ['S3', 'C4500'],
+    ])
+    expect(detail.totals.unpriced_count).toBe(2)
+  })
+
+  it('removes nothing when a row id belongs to another bid', async () => {
+    const { bidNumber, rowIds } = await createBidWithRows()
+    const other = await createBidWithRows()
+    const [firstRowId] = rowIds
+
+    await expect(
+      removeBidRows(bidNumber, { row_ids: [firstRowId, ...other.rowIds] }),
+    ).rejects.toThrow(ValidationError)
+
+    expect((await getBid(bidNumber)).rows).toHaveLength(3)
+    expect((await getBid(other.bidNumber)).rows).toHaveLength(3)
+  })
+
+  it('saves manual column mappings and returns them on the bid', async () => {
+    const bidNumber = await createVendorSheetBid()
+
+    const detail = await updateBidColumnMappings(bidNumber, {
+      mappings: [
+        { column_index: BRAND_COLUMN, role: BID_COLUMN_ROLE.BRAND },
+        { column_index: MILEAGE_COLUMN, role: BID_COLUMN_ROLE.TOTAL_METER },
+      ],
+    })
+
+    expect(detail.column_mappings).toEqual([
+      { column_index: BRAND_COLUMN, role: BID_COLUMN_ROLE.BRAND },
+      { column_index: MILEAGE_COLUMN, role: BID_COLUMN_ROLE.TOTAL_METER },
+    ])
+  })
+
+  it('replaces the earlier column mappings on a second save', async () => {
+    const bidNumber = await createVendorSheetBid()
+    await updateBidColumnMappings(bidNumber, {
+      mappings: [{ column_index: BRAND_COLUMN, role: BID_COLUMN_ROLE.BRAND }],
+    })
+
+    const detail = await updateBidColumnMappings(bidNumber, {
+      mappings: [{ column_index: MILEAGE_COLUMN, role: BID_COLUMN_ROLE.TOTAL_METER }],
+    })
+
+    expect(detail.column_mappings).toEqual([
+      { column_index: MILEAGE_COLUMN, role: BID_COLUMN_ROLE.TOTAL_METER },
+    ])
+  })
+
+  it('rejects a mapping to a column the bid does not have', async () => {
+    const bidNumber = await createVendorSheetBid()
+    await expect(
+      updateBidColumnMappings(bidNumber, {
+        mappings: [{ column_index: VENDOR_HEADERS.length, role: BID_COLUMN_ROLE.BRAND }],
+      }),
+    ).rejects.toThrow(ValidationError)
+  })
+
+  it('rejects a mapping to an automatically recognised column', async () => {
+    const bidNumber = await createVendorSheetBid()
+    await expect(
+      updateBidColumnMappings(bidNumber, {
+        mappings: [{ column_index: MODELS_COLUMN, role: BID_COLUMN_ROLE.NOTES }],
+      }),
+    ).rejects.toThrow(ValidationError)
+  })
+
+  it('rejects a mapping of an automatically recognised type', async () => {
+    const bidNumber = await createVendorSheetBid()
+    await expect(
+      updateBidColumnMappings(bidNumber, {
+        mappings: [{ column_index: MILEAGE_COLUMN, role: BID_COLUMN_ROLE.MODEL }],
+      }),
+    ).rejects.toThrow(ValidationError)
+    expect((await getBid(bidNumber)).column_mappings).toEqual([])
+  })
+
+  it('accepts re-saving a stored mapping that an automatic match would now clash with', async () => {
+    const bidNumber = await createVendorSheetBid()
+    const { id } = await prisma.bid.findUniqueOrThrow({ where: { bid_number: bidNumber } })
+    await prisma.bidColumnMapping.create({
+      data: { bid_id: id, column_index: MILEAGE_COLUMN, role: BID_COLUMN_ROLE.MODEL },
+    })
+
+    const detail = await updateBidColumnMappings(bidNumber, {
+      mappings: [{ column_index: MILEAGE_COLUMN, role: BID_COLUMN_ROLE.MODEL }],
+    })
+
+    expect(detail.column_mappings).toEqual([
+      { column_index: MILEAGE_COLUMN, role: BID_COLUMN_ROLE.MODEL },
+    ])
+  })
+
+  it('clears manual column mappings on re-upload', async () => {
+    const bidNumber = await createVendorSheetBid()
+    await updateBidColumnMappings(bidNumber, {
+      mappings: [{ column_index: BRAND_COLUMN, role: BID_COLUMN_ROLE.BRAND }],
+    })
+
+    const detail = await uploadBidRows(bidNumber, { headers: VENDOR_HEADERS, rows: VENDOR_ROWS })
+
+    expect(detail.column_mappings).toEqual([])
+  })
+
+  it('deletes a draft that has column mappings', async () => {
+    const bidNumber = await createVendorSheetBid()
+    await updateBidColumnMappings(bidNumber, {
+      mappings: [{ column_index: BRAND_COLUMN, role: BID_COLUMN_ROLE.BRAND }],
+    })
+
+    await deleteBid(bidNumber)
+
+    await expect(getBid(bidNumber)).rejects.toThrow(NotFoundError)
+  })
+
   it('rejects review with no rows', async () => {
     const bidNumber = await createBid(buildCreateBidInput(), seed.userId)
     await expect(reviewBid(bidNumber)).rejects.toThrow(ConflictError)
@@ -344,7 +486,7 @@ describe('bidService', () => {
     expect((await getBid(bidNumber)).outcome).toBe(BID_OUTCOME.WON)
   })
 
-  it('rejects upload, row pricing, header edits and delete outside draft', async () => {
+  it('rejects upload, row pricing, row removal, column mapping, header edits and delete outside draft', async () => {
     const bidNumber = await createSubmittedBid()
     const { rows } = await getBid(bidNumber)
     const rowIds = rows.map((row) => row.id)
@@ -357,6 +499,10 @@ describe('bidService', () => {
     await expect(
       updateBidRows(bidNumber, { row_ids: [firstRowId], selling_price: 1 }),
     ).rejects.toThrow(ConflictError)
+    await expect(removeBidRows(bidNumber, { row_ids: [firstRowId] })).rejects.toThrow(ConflictError)
+    await expect(updateBidColumnMappings(bidNumber, { mappings: [] })).rejects.toThrow(
+      ConflictError,
+    )
     await expect(updateBidMetadata(bidNumber, buildCreateBidInput())).rejects.toThrow(ConflictError)
     await expect(deleteBid(bidNumber)).rejects.toThrow(ConflictError)
   })

@@ -38,13 +38,22 @@ export function parseBidPaste(text: string, firstRowIsHeaders: boolean): BidPast
   if (firstRow === undefined) return { ok: false, error: 'Paste at least one row of data' }
 
   const resolvedHeaders = headers ?? padTo(width, [])
-  const error = limitError(resolvedHeaders, rows)
+  const keptColumns = [...resolvedHeaders.keys()].filter(
+    (index) => resolvedHeaders[index] !== '' || rows.some((row) => row[index] !== ''),
+  )
+  const keptHeaders = keptColumns.map((index) => resolvedHeaders[index] ?? '')
+  const keepCells = (row: string[]) => keptColumns.map((index) => row[index] ?? '')
+
+  const error = limitError(keptHeaders, rows)
   if (error !== null) return { ok: false, error }
 
-  const [firstHeader, ...otherHeaders] = resolvedHeaders
+  const [firstHeader, ...otherHeaders] = keptHeaders
   if (firstHeader === undefined) return { ok: false, error: 'Paste at least one column' }
   return {
     ok: true,
-    upload: { headers: [firstHeader, ...otherHeaders], rows: [firstRow, ...remainingRows] },
+    upload: {
+      headers: [firstHeader, ...otherHeaders],
+      rows: [keepCells(firstRow), ...remainingRows.map(keepCells)],
+    },
   }
 }

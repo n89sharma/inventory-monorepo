@@ -75,6 +75,7 @@ export const ModelName = {
   Transfer: 'Transfer',
   AssetTransfer: 'AssetTransfer',
   Bid: 'Bid',
+  BidColumnMapping: 'BidColumnMapping',
   BidRow: 'BidRow',
   Arrival: 'Arrival',
   Departure: 'Departure',
@@ -404,6 +405,16 @@ export const BidScalarFieldEnum = {
 } as const
 
 export type BidScalarFieldEnum = (typeof BidScalarFieldEnum)[keyof typeof BidScalarFieldEnum]
+
+
+export const BidColumnMappingScalarFieldEnum = {
+  id: 'id',
+  bid_id: 'bid_id',
+  column_index: 'column_index',
+  role: 'role'
+} as const
+
+export type BidColumnMappingScalarFieldEnum = (typeof BidColumnMappingScalarFieldEnum)[keyof typeof BidColumnMappingScalarFieldEnum]
 
 
 export const BidRowScalarFieldEnum = {

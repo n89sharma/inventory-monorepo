@@ -5,8 +5,10 @@ import {
   deleteBid,
   getBidDetail,
   getBids,
+  patchBidColumns,
   patchBidMetadata,
   patchBidRows,
+  removeBidRows,
   returnBidToDraft,
   reviewBid,
   submitBid,
@@ -30,6 +32,8 @@ router.patch('/:bidNumber/metadata', patchBidMetadata)
 router.delete('/:bidNumber', deleteBid)
 router.post('/:bidNumber/upload', uploadBidRows)
 router.patch('/:bidNumber/rows', patchBidRows)
+router.post('/:bidNumber/rows/remove', removeBidRows)
+router.patch('/:bidNumber/columns', patchBidColumns)
 router.post('/:bidNumber/review', reviewBid)
 router.post('/:bidNumber/return-to-draft', returnBidToDraft)
 router.post('/:bidNumber/submit', submitBid)

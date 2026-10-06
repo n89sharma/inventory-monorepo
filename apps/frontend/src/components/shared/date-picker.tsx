@@ -78,10 +78,7 @@ function DatePickerPopover({
   )
 }
 
-function DatePickerFieldInline({
-  label,
-  ...props
-}: DatePickerFieldProps): React.JSX.Element {
+function DatePickerFieldInline({ label, ...props }: DatePickerFieldProps): React.JSX.Element {
   const triggerText = isSelected(props.date)
     ? `${label}: ${formatDate(props.date.selected)}`
     : label

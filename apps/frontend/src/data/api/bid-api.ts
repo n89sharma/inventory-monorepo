@@ -14,6 +14,8 @@ import type {
   ConcludeBid,
   CreateBid,
   OrgDetail,
+  RemoveBidRows,
+  UpdateBidColumnMappings,
   UpdateBidRows,
   UploadBidRows,
 } from 'shared-types'
@@ -23,6 +25,8 @@ import {
   BidSummarySchema,
   ConcludeBidSchema,
   CreateBidSchema,
+  RemoveBidRowsSchema,
+  UpdateBidColumnMappingsSchema,
   UpdateBidRowsSchema,
   UploadBidRowsSchema,
 } from 'shared-types'
@@ -86,10 +90,29 @@ export async function uploadBidRows(bidNumber: string, upload: UploadBidRows): P
   return BidDetailSchema.parse(data)
 }
 
+export async function updateBidColumnMappings(
+  bidNumber: string,
+  update: UpdateBidColumnMappings,
+): Promise<BidDetail> {
+  const updateBidColumnMappingsBody = UpdateBidColumnMappingsSchema.parse(
+    update satisfies UpdateBidColumnMappings,
+  )
+  const { data } = await api.patch<BidDetail>(
+    `/bids/${bidNumber}/columns`,
+    updateBidColumnMappingsBody,
+  )
+  return BidDetailSchema.parse(data)
+}
+
 export async function updateBidRows(bidNumber: string, update: UpdateBidRows): Promise<BidDetail> {
   const updateBidRowsBody = UpdateBidRowsSchema.parse(update satisfies UpdateBidRows)
   const { data } = await api.patch<BidDetail>(`/bids/${bidNumber}/rows`, updateBidRowsBody)
   return BidDetailSchema.parse(data)
+}
+
+export async function removeBidRows(bidNumber: string, removal: RemoveBidRows): Promise<void> {
+  const removeBidRowsBody = RemoveBidRowsSchema.parse(removal satisfies RemoveBidRows)
+  await api.post(`/bids/${bidNumber}/rows/remove`, removeBidRowsBody)
 }
 
 export async function reviewBid(bidNumber: string): Promise<void> {

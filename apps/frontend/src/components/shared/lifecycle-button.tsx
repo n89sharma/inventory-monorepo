@@ -9,6 +9,7 @@ import {
   AlertDialogTrigger,
 } from '@/components/shadcn/alert-dialog'
 import { Button } from '@/components/shadcn/button'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/shadcn/tooltip'
 import { SpinnerGapIcon } from '@phosphor-icons/react'
 import { useState } from 'react'
 
@@ -18,15 +19,43 @@ interface LifecycleButtonProps {
   description?: string
   onConfirm: () => Promise<void>
   disabled?: boolean
+  disabledReason?: string | null
 }
 
 export function LifecycleButton({
+  disabledReason,
+  ...props
+}: LifecycleButtonProps): React.JSX.Element {
+  if (disabledReason) return <BlockedLifecycleButton label={props.label} reason={disabledReason} />
+  return <ConfirmLifecycleButton {...props} />
+}
+
+function BlockedLifecycleButton({
+  label,
+  reason,
+}: {
+  label: string
+  reason: string
+}): React.JSX.Element {
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <span tabIndex={0} className="inline-flex">
+          <Button disabled>{label}</Button>
+        </span>
+      </TooltipTrigger>
+      <TooltipContent>{reason}</TooltipContent>
+    </Tooltip>
+  )
+}
+
+function ConfirmLifecycleButton({
   label,
   title,
   description,
   onConfirm,
   disabled,
-}: LifecycleButtonProps): React.JSX.Element {
+}: Omit<LifecycleButtonProps, 'disabledReason'>): React.JSX.Element {
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
 

@@ -408,6 +408,7 @@ export const ModelName = {
   Transfer: 'Transfer',
   AssetTransfer: 'AssetTransfer',
   Bid: 'Bid',
+  BidColumnMapping: 'BidColumnMapping',
   BidRow: 'BidRow',
   Arrival: 'Arrival',
   Departure: 'Departure',
@@ -448,7 +449,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "accessory" | "assetType" | "status" | "readiness" | "fileType" | "invoiceType" | "role" | "permission" | "rolePermission" | "country" | "asset" | "technicalSpecification" | "cost" | "assetAccessory" | "error" | "assetError" | "storePart" | "storeTransactionType" | "storeTransaction" | "assetStorePart" | "assetSalvagedPart" | "transfer" | "assetTransfer" | "bid" | "bidRow" | "arrival" | "departure" | "assetDeparture" | "hold" | "invoice" | "location" | "zone" | "warehouse" | "warehouseTransferCost" | "brand" | "model" | "component" | "file" | "comment" | "user" | "release" | "releaseNote" | "savedView" | "organization" | "monthEndSchedule" | "monthEndReport" | "monthEndReportAsset" | "monthEndReportPart" | "history"
+    modelProps: "accessory" | "assetType" | "status" | "readiness" | "fileType" | "invoiceType" | "role" | "permission" | "rolePermission" | "country" | "asset" | "technicalSpecification" | "cost" | "assetAccessory" | "error" | "assetError" | "storePart" | "storeTransactionType" | "storeTransaction" | "assetStorePart" | "assetSalvagedPart" | "transfer" | "assetTransfer" | "bid" | "bidColumnMapping" | "bidRow" | "arrival" | "departure" | "assetDeparture" | "hold" | "invoice" | "location" | "zone" | "warehouse" | "warehouseTransferCost" | "brand" | "model" | "component" | "file" | "comment" | "user" | "release" | "releaseNote" | "savedView" | "organization" | "monthEndSchedule" | "monthEndReport" | "monthEndReportAsset" | "monthEndReportPart" | "history"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2225,6 +2226,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.BidCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.BidCountAggregateOutputType> | number
+        }
+      }
+    }
+    BidColumnMapping: {
+      payload: Prisma.$BidColumnMappingPayload<ExtArgs>
+      fields: Prisma.BidColumnMappingFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.BidColumnMappingFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BidColumnMappingPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.BidColumnMappingFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BidColumnMappingPayload>
+        }
+        findFirst: {
+          args: Prisma.BidColumnMappingFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BidColumnMappingPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.BidColumnMappingFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BidColumnMappingPayload>
+        }
+        findMany: {
+          args: Prisma.BidColumnMappingFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BidColumnMappingPayload>[]
+        }
+        create: {
+          args: Prisma.BidColumnMappingCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BidColumnMappingPayload>
+        }
+        createMany: {
+          args: Prisma.BidColumnMappingCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.BidColumnMappingCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BidColumnMappingPayload>[]
+        }
+        delete: {
+          args: Prisma.BidColumnMappingDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BidColumnMappingPayload>
+        }
+        update: {
+          args: Prisma.BidColumnMappingUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BidColumnMappingPayload>
+        }
+        deleteMany: {
+          args: Prisma.BidColumnMappingDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.BidColumnMappingUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.BidColumnMappingUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BidColumnMappingPayload>[]
+        }
+        upsert: {
+          args: Prisma.BidColumnMappingUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BidColumnMappingPayload>
+        }
+        aggregate: {
+          args: Prisma.BidColumnMappingAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateBidColumnMapping>
+        }
+        groupBy: {
+          args: Prisma.BidColumnMappingGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BidColumnMappingGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.BidColumnMappingCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BidColumnMappingCountAggregateOutputType> | number
         }
       }
     }
@@ -4409,6 +4484,16 @@ export const BidScalarFieldEnum = {
 export type BidScalarFieldEnum = (typeof BidScalarFieldEnum)[keyof typeof BidScalarFieldEnum]
 
 
+export const BidColumnMappingScalarFieldEnum = {
+  id: 'id',
+  bid_id: 'bid_id',
+  column_index: 'column_index',
+  role: 'role'
+} as const
+
+export type BidColumnMappingScalarFieldEnum = (typeof BidColumnMappingScalarFieldEnum)[keyof typeof BidColumnMappingScalarFieldEnum]
+
+
 export const BidRowScalarFieldEnum = {
   id: 'id',
   bid_id: 'bid_id',
@@ -5037,6 +5122,7 @@ export type GlobalOmitConfig = {
   transfer?: Prisma.TransferOmit
   assetTransfer?: Prisma.AssetTransferOmit
   bid?: Prisma.BidOmit
+  bidColumnMapping?: Prisma.BidColumnMappingOmit
   bidRow?: Prisma.BidRowOmit
   arrival?: Prisma.ArrivalOmit
   departure?: Prisma.DepartureOmit

@@ -9,9 +9,10 @@ import {
   type BidRowEditing,
 } from '@/components/bid/bid-row-table-columns'
 import { BidLifecycleActions } from '@/components/bid/bid-lifecycle-actions'
-import { BidOutcomeBadge, BidStatusBadge } from '@/components/bid/bid-status-badge'
+import { BidOutcomeBadge, BidStatusBadge, BidWarningBadge } from '@/components/bid/bid-status-badge'
 import { BidTotalsStrip } from '@/components/bid/bid-totals-strip'
 import { EditBidMetadataModal } from '@/components/bid/edit-bid-metadata-modal'
+import { MapBidColumnsDialog } from '@/components/bid/map-bid-columns-dialog'
 import {
   SetBidRowsFreightDialog,
   SetBidRowsMarginDialog,
@@ -24,6 +25,7 @@ import {
 import { GridDetailsPageHeader } from '@/components/collections/sticky-details-page-header'
 import { AlertDialogDescription } from '@/components/shadcn/alert-dialog'
 import { Button } from '@/components/shadcn/button'
+import { Separator } from '@/components/shadcn/separator'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -40,13 +42,14 @@ import { TableToolbarEnd } from '@/components/shared/table-toolbar'
 import { useBidDetail } from '@/hooks/use-bid'
 import { useBidMutations } from '@/hooks/use-bid-mutations'
 import { useEntityDelete } from '@/hooks/use-entity-delete'
+import { labelBidColumns } from '@/lib/bid-column-labels'
 import { formatDateOnly, formatUSDWithSymbol } from '@/lib/formatters'
 import { createPriceCellEditorRegistry } from '@/lib/price-cell-navigation'
 import { queryStringFrom } from '@/ui-types/navigation-context'
 import { DotsThreeVerticalIcon, PencilSimpleIcon, TrashIcon } from '@phosphor-icons/react'
 import type { RowSelectionState, TableOptions, VisibilityState } from '@tanstack/react-table'
 import { useOptimisticSearchParams } from 'nuqs/adapters/react-router/v7'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { bidCsvColumns, bidCsvFilename } from '@/lib/bid-csv'
 import { toCsv } from '@/lib/csv'
@@ -66,6 +69,22 @@ const getBidRowId = (row: BidRow) => String(row.id)
 
 const CSV_MIME_TYPE = 'text/csv'
 const SENT_STATUSES: string[] = [BID_STATUS.SUBMITTED, BID_STATUS.CONCLUDED]
+
+type ReviewBlocker = { badge: string; reason: string }
+
+function getReviewBlocker(bid: BidDetail): ReviewBlocker | null {
+  if (bid.status !== BID_STATUS.DRAFT) return null
+  if (bid.rows.length === 0) {
+    return { badge: 'No rows', reason: 'Upload the vendor sheet before review' }
+  }
+  if (bid.totals.unpriced_count > 0) {
+    return {
+      badge: `${bid.totals.unpriced_count} unpriced`,
+      reason: 'Price every row before review',
+    }
+  }
+  return null
+}
 
 function BidDownloadButton({ bid }: { bid: BidDetail }): React.JSX.Element {
   function download() {
@@ -147,8 +166,13 @@ function BidDetailsContent({ bid }: { bid: BidDetail }): React.JSX.Element {
   const [bulkDialog, setBulkDialog] = useState<BulkDialog | null>(null)
   const editorRegistry = useMemo(() => createPriceCellEditorRegistry<BidPriceField>(), [])
   const isDraft = bid.status === BID_STATUS.DRAFT
+  const reviewBlocker = getReviewBlocker(bid)
   const isSent = SENT_STATUSES.includes(bid.status)
   const handleDelete = useEntityDelete(ENTITY_LABEL, bidNumber, bidNumber, mutations.remove)
+
+  useEffect(() => {
+    return () => mutations.flushPending(bidNumber)
+  }, [mutations, bidNumber])
 
   const saveField = useCallback(
     (rowId: number, field: BidPriceField, value: number | null) =>
@@ -163,8 +187,9 @@ function BidDetailsContent({ bid }: { bid: BidDetail }): React.JSX.Element {
     () => (isDraft ? { editorRegistry, saveField, toggleZeroPrice } : undefined),
     [isDraft, editorRegistry, saveField, toggleZeroPrice],
   )
-  const columns = useMemo(() => buildBidGridColumns(bid.headers, editing), [bid.headers, editing])
-  const pickerColumns = useMemo(() => bidPickerColumns(bid.headers), [bid.headers])
+  const sheetColumns = useMemo(() => labelBidColumns(bid), [bid])
+  const columns = useMemo(() => buildBidGridColumns(sheetColumns, editing), [sheetColumns, editing])
+  const pickerColumns = useMemo(() => bidPickerColumns(sheetColumns), [sheetColumns])
   const visibleColumnIds = new Set(
     pickerColumns.filter((column) => !hiddenColumnIds.has(column.id)).map((column) => column.id),
   )
@@ -183,6 +208,12 @@ function BidDetailsContent({ bid }: { bid: BidDetail }): React.JSX.Element {
   const selectedRowIds = bid.rows.filter((row) => rowSelection[getBidRowId(row)]).map((r) => r.id)
   const [firstSelectedId, ...otherSelectedIds] = selectedRowIds
   const clearSelection = () => setRowSelection({})
+
+  function removeSelection() {
+    if (firstSelectedId === undefined) return
+    mutations.removeRows(bidNumber, [firstSelectedId, ...otherSelectedIds])
+    clearSelection()
+  }
 
   async function applyToSelection(update: {
     transport_cost?: number
@@ -205,6 +236,7 @@ function BidDetailsContent({ bid }: { bid: BidDetail }): React.JSX.Element {
         titleBadge={
           <>
             <BidStatusBadge status={bid.status} />
+            {reviewBlocker !== null && <BidWarningBadge label={reviewBlocker.badge} />}
             {bid.outcome ? <BidOutcomeBadge outcome={bid.outcome} /> : null}
           </>
         }
@@ -216,11 +248,16 @@ function BidDetailsContent({ bid }: { bid: BidDetail }): React.JSX.Element {
                 onUpload={(upload) => mutations.upload(bidNumber, upload)}
               />
             )}
+            {isDraft && bid.rows.length > 0 && (
+              <MapBidColumnsDialog
+                bid={bid}
+                onSave={(mappings) => mutations.mapColumns(bidNumber, { mappings })}
+              />
+            )}
             {isSent && <BidDownloadButton bid={bid} />}
             <BidLifecycleActions
               status={bid.status}
-              rowCount={bid.rows.length}
-              unpricedCount={bid.totals.unpriced_count}
+              reviewBlockedReason={reviewBlocker?.reason ?? null}
               onReview={() => mutations.review(bidNumber)}
               onReturnToDraft={() => mutations.returnToDraft(bidNumber)}
               onSubmit={() => mutations.submit(bidNumber)}
@@ -319,6 +356,11 @@ function BidDetailsContent({ bid }: { bid: BidDetail }): React.JSX.Element {
               </Button>
               <Button variant="secondary" onClick={() => applyToSelection({ zero_priced: true })}>
                 Mark No Bid
+              </Button>
+              <Separator orientation="vertical" className="mx-1 h-5" />
+              <Button variant="destructive" onClick={removeSelection}>
+                <TrashIcon />
+                Remove
               </Button>
             </BulkActionBar>
           )
