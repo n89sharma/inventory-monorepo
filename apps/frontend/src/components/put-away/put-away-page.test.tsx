@@ -235,6 +235,37 @@ describe('PutAwayPage', () => {
       expect(screen.getByText('1 asset')).toBeInTheDocument()
     })
 
+    it('lists an asset once when the scanner sends Enter twice before the lookup returns', async () => {
+      let resolveLookup: (asset: AssetSummary) => void = () => {}
+      getAssetByBarcode.mockReturnValue(
+        new Promise<AssetSummary>((resolve) => {
+          resolveLookup = resolve
+        }),
+      )
+      renderPage()
+
+      await scanLocation('a1')
+      scan(assetInput(), 'bc-1')
+      await act(async () => {
+        fireEvent.keyDown(assetInput(), { key: 'Enter' })
+        fireEvent.keyDown(assetInput(), { key: 'Enter' })
+      })
+      await act(async () => {
+        resolveLookup(ASSET)
+      })
+
+      expect(getAssetByBarcode).toHaveBeenCalledTimes(1)
+      expect(screen.getByText('1 asset')).toBeInTheDocument()
+
+      await act(async () => {
+        fireEvent.click(screen.getByRole('button', { name: 'Save 1 asset' }))
+      })
+
+      expect(bulkUpdateAssetLocation).toHaveBeenCalledWith(
+        expect.objectContaining({ barcodes: ['BC-1'] }),
+      )
+    })
+
     it('refuses an asset that is in transit', async () => {
       getAssetByBarcode.mockResolvedValue(IN_TRANSIT_ASSET)
       renderPage()

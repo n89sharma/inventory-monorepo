@@ -95,8 +95,11 @@ export function AddAssetsByBarcodeOrSerial({
   const [suggestionsAllowed, setSuggestionsAllowed] = useState(true)
   const { results } = useGlobalSearch(searchQuery, ASSET_SEARCH_TYPES)
   const suggestions = results.assets
+  const lookupInFlightRef = useRef(false)
 
   async function addByBarcode(barcode: string) {
+    if (lookupInFlightRef.current) return
+    lookupInFlightRef.current = true
     setAssetError(null)
     setIsLookingUp(true)
     try {
@@ -127,6 +130,7 @@ export function AddAssetsByBarcodeOrSerial({
     } catch {
       setAssetError('Asset not found.')
     } finally {
+      lookupInFlightRef.current = false
       setIsLookingUp(false)
     }
   }

@@ -283,7 +283,10 @@ export function PutAwayPage(): React.JSX.Element {
   }
 
   function addAsset(asset: AssetSummary) {
-    setScannedAssets((prev) => [asset, ...prev])
+    setScannedAssets((prev) => {
+      if (prev.some((a) => a.barcode === asset.barcode)) return prev
+      return [asset, ...prev]
+    })
   }
 
   function removeAsset(barcode: string) {
@@ -292,16 +295,17 @@ export function PutAwayPage(): React.JSX.Element {
 
   async function handleSave() {
     if (!selectedLocation || scannedAssets.length === 0) return
+    const barcodes = [...new Set(scannedAssets.map((a) => a.barcode))]
     setSaving(true)
     try {
       await bulkUpdateAssetLocation({
         warehouse_id: selectedLocation.warehouse_id,
         zone_id: selectedLocation.zone_id,
         bin: selectedLocation.bin,
-        barcodes: scannedAssets.map((a) => a.barcode),
+        barcodes,
       })
       toast.success(
-        `Moved ${assetCountLabel(scannedAssets.length)} to ${locationName(selectedLocation)}`,
+        `Moved ${assetCountLabel(barcodes.length)} to ${locationName(selectedLocation)}`,
         { position: 'top-center' },
       )
       setScannedAssets([])
