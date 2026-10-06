@@ -16,6 +16,7 @@ const PRICED_ROW: BidRow = {
   bid_price: 720,
   total_cost: 750,
   margin_amount: 250,
+  model: null,
 }
 
 const NO_BID_ROW: BidRow = {
@@ -61,6 +62,16 @@ describe('bidCsvColumns', () => {
   it('keeps an unreadable Total Meter as pasted', () => {
     const bid = makeBid(['Total Meter'], [{ ...PRICED_ROW, cells: ['n/a'] }])
     expect(toCsv(bidCsvColumns(bid), bid.rows).split('\r\n')[1]?.split(',')[0]).toBe('n/a')
+  })
+
+  it('keeps the vendor model text and leaves the stock figures out', () => {
+    const bid = makeBid(
+      ['Model'],
+      [{ ...PRICED_ROW, cells: ['ir adv 4245'], model: { id: 1, name: 'IRA4245' } }],
+    )
+    const [header, firstRow] = toCsv(bidCsvColumns(bid), bid.rows).split('\r\n')
+    expect(header).toBe('Model,Selling Price,Freight,Margin %,Margin,Bid Price,No Bid')
+    expect(firstRow?.split(',')[0]).toBe('ir adv 4245')
   })
 
   it('names a blank pasted header Unknown with its first value', () => {

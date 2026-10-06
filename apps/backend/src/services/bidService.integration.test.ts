@@ -3,23 +3,33 @@ import {
   BID_COLUMN_ROLE,
   BID_OUTCOME,
   BID_STATUS,
+  OUTGOING_STATUS,
   DEFAULT_BID_MARGIN_PERCENT,
   DEFAULT_BID_TRANSPORT_COST,
   type CreateBid,
 } from 'shared-types'
 import {
   ArrivalTestData,
+  buildCreateHoldInput,
   cleanupTransactionalData,
+  createArrivedAssets,
+  createLoadedDeparture,
+  REDACTED_ASSET_COST,
   seedArrivalTestData,
+  seedAssetCost,
+  seedBrand,
+  seedModel,
 } from '../../test/factories.js'
 import { todayYmd } from '../lib/date-only.js'
 import { ConflictError, NotFoundError, ValidationError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
+import { createHold } from './holdService.js'
 import {
   concludeBid,
   createBid,
   deleteBid,
   getBid,
+  getBidModelStock,
   getBidSummaries,
   removeBidRows,
   returnBidToDraft,
@@ -45,6 +55,10 @@ const VENDOR_ROWS: [string[], ...string[][]] = [['Canon', 'C3000', 'S1', '120000
 const BRAND_COLUMN = 0
 const MODELS_COLUMN = 1
 const MILEAGE_COLUMN = 3
+
+const SALES_FROM = '2026-04-05'
+const INSIDE_SALES_WINDOW = '2026-05-01'
+const BEFORE_SALES_WINDOW = '2026-04-04'
 
 let seed: ArrivalTestData
 
@@ -74,6 +88,29 @@ async function createVendorSheetBid(): Promise<string> {
     buildCreateBidInput({ sheet: { headers: VENDOR_HEADERS, rows: VENDOR_ROWS } }),
     seed.userId,
   )
+}
+
+async function createSheetBid(headers: [string, ...string[]], rows: [string[], ...string[][]]) {
+  const bidNumber = await createBid(buildCreateBidInput({ sheet: { headers, rows } }), seed.userId)
+  return getBid(bidNumber)
+}
+
+async function seedRebadgedTwins(): Promise<{ ricohModelId: number; savinModelId: number }> {
+  const ricohModelId = await seedModel(await seedBrand('Ricoh'), 'IMC6000', true)
+  const savinModelId = await seedModel(await seedBrand('Savin'), 'IMC6000', true)
+  return { ricohModelId, savinModelId }
+}
+
+async function sellSeededModel(salePrice: number, departureDate: string): Promise<void> {
+  const [asset] = await createArrivedAssets(seed, 1)
+  await seedAssetCost(asset.id, { ...REDACTED_ASSET_COST, sale_price: salePrice })
+  const departureNumber = await createLoadedDeparture(seed, [
+    { id: asset.id, outgoing_status: OUTGOING_STATUS.SOLD },
+  ])
+  await prisma.departure.update({
+    where: { departure_number: departureNumber },
+    data: { departure_date: new Date(departureDate) },
+  })
 }
 
 async function priceEveryRow(bidNumber: string, rowIds: [number, ...number[]]): Promise<void> {
@@ -405,6 +442,78 @@ describe('bidService', () => {
     await deleteBid(bidNumber)
 
     await expect(getBid(bidNumber)).rejects.toThrow(NotFoundError)
+  })
+
+  it('matches a vendor spelling to its catalogue model', async () => {
+    const bid = await createSheetBid(['Model', 'Serial'], [['IR Adv DX 4745i', 'S1']])
+    expect(bid.rows[0]?.model).toEqual({ id: seed.model.id, name: seed.model.model_name })
+  })
+
+  it('uses the Brand column to choose between rebadged twins', async () => {
+    const { ricohModelId, savinModelId } = await seedRebadgedTwins()
+    const bid = await createSheetBid(
+      ['Make', 'Model'],
+      [
+        ['Savin', 'IMC6000'],
+        ['RICOH', 'IMC6000'],
+      ],
+    )
+    expect(bid.rows.map((row) => row.model?.id)).toEqual([savinModelId, ricohModelId])
+  })
+
+  it('leaves a rebadged name unmatched when there is no Brand column', async () => {
+    await seedRebadgedTwins()
+    const bid = await createSheetBid(['Model'], [['IMC6000']])
+    expect(bid.rows[0]?.model).toBeNull()
+  })
+
+  it('leaves a row unmatched when its text names two models', async () => {
+    const bid = await createSheetBid(['Model'], [['IR Adv DX 4745i/4755i']])
+    expect(bid.rows[0]?.model).toBeNull()
+  })
+
+  it('leaves every row unmatched when the bid has no Model column', async () => {
+    const bid = await createSheetBid(['Serial'], [['IR Adv DX 4745i']])
+    expect(bid.rows[0]?.model).toBeNull()
+  })
+
+  it('sums stock across meter bands and takes the median of sales inside the window', async () => {
+    const [held] = await createArrivedAssets(seed, 3)
+    await createHold(buildCreateHoldInput(seed, [held]), seed.userId)
+    await sellSeededModel(100, INSIDE_SALES_WINDOW)
+    await sellSeededModel(300, INSIDE_SALES_WINDOW)
+    await sellSeededModel(200, INSIDE_SALES_WINDOW)
+    await sellSeededModel(900, BEFORE_SALES_WINDOW)
+    const bid = await createSheetBid(['Model'], [['iR ADV DX 4745i']])
+
+    expect(await getBidModelStock(bid.bid_number, SALES_FROM)).toEqual([
+      {
+        model_id: seed.model.id,
+        in_stock_count: 2,
+        held_count: 1,
+        median_sale_price: 200,
+        sales_count: 3,
+      },
+    ])
+  })
+
+  it('reports a matched model with no stock or sales as zeros with no median', async () => {
+    const { ricohModelId } = await seedRebadgedTwins()
+    const bid = await createSheetBid(['Make', 'Model'], [['Ricoh', 'IMC6000']])
+
+    expect(await getBidModelStock(bid.bid_number, SALES_FROM)).toEqual([
+      {
+        model_id: ricohModelId,
+        in_stock_count: 0,
+        held_count: 0,
+        median_sale_price: null,
+        sales_count: 0,
+      },
+    ])
+  })
+
+  it('reports model stock for a missing bid as not found', async () => {
+    await expect(getBidModelStock('B-9999999', SALES_FROM)).rejects.toThrow(NotFoundError)
   })
 
   it('rejects review with no rows', async () => {

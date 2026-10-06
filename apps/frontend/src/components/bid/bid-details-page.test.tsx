@@ -3,7 +3,7 @@ import { TooltipProvider } from '@/components/shadcn/tooltip'
 import { fireEvent, render, screen } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { NuqsTestingAdapter } from 'nuqs/adapters/testing'
-import { BID_COLUMN_ROLE, BID_STATUS, type BidDetail } from 'shared-types'
+import { BID_COLUMN_ROLE, BID_STATUS, type BidDetail, type BidModelStock } from 'shared-types'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { BidDetailsPage } from './bid-details-page'
 
@@ -41,11 +41,24 @@ vi.mock('@/hooks/use-bid-mutations', () => ({
   }),
 }))
 
-const detail = vi.hoisted(() => ({ data: undefined as BidDetail | undefined }))
+const detail = vi.hoisted(() => ({
+  data: undefined as BidDetail | undefined,
+  modelStock: [] as BidModelStock[],
+}))
 
 vi.mock('@/hooks/use-bid', () => ({
   useBidDetail: () => ({ data: detail.data, error: undefined, isLoading: !detail.data }),
+  useBidModelStock: () => ({ data: detail.modelStock }),
 }))
+
+const MATCHED_MODEL = { id: 7, name: 'IRADX4745I' }
+const MATCHED_MODEL_STOCK: BidModelStock = {
+  model_id: MATCHED_MODEL.id,
+  in_stock_count: 4,
+  held_count: 2,
+  median_sale_price: 650,
+  sales_count: 12,
+}
 
 function makeBid(status: string): BidDetail {
   return {
@@ -78,6 +91,7 @@ function makeBid(status: string): BidDetail {
         bid_price: 700,
         total_cost: 800,
         margin_amount: 200,
+        model: null,
       },
     ],
     column_mappings: [],
@@ -102,7 +116,21 @@ function renderPage(status: string, overrides: Partial<BidDetail> = {}) {
 describe('BidDetailsPage', () => {
   beforeEach(() => {
     detail.data = undefined
+    detail.modelStock = []
   })
+
+  function renderModelBid() {
+    const [row] = makeBid(BID_STATUS.DRAFT).rows
+    if (row === undefined) throw new Error('Expected a row')
+    detail.modelStock = [MATCHED_MODEL_STOCK]
+    renderPage(BID_STATUS.DRAFT, {
+      headers: ['Model', 'Location'],
+      rows: [
+        { ...row, cells: ['ir Adv DX 4745i', 'Dock 4'], model: MATCHED_MODEL },
+        { ...row, id: 12, cells: ['IP 1135+', 'Dock 5'], model: null },
+      ],
+    })
+  }
 
   it('lets a draft upload rows and edit prices in the row', () => {
     renderPage(BID_STATUS.DRAFT)
@@ -149,6 +177,54 @@ describe('BidDetailsPage', () => {
       rows: [{ ...row, cells: ['S1', '191,346'] }],
     })
     expect(screen.getByRole('cell', { name: '191 K' })).toBeInTheDocument()
+  })
+
+  it('shows a matched model by its catalogue name in green, with the vendor text on hover', () => {
+    renderModelBid()
+    const matched = screen.getByText(MATCHED_MODEL.name)
+    expect(matched).toHaveClass('text-emerald-700')
+    expect(matched).toHaveAttribute('title', 'ir Adv DX 4745i')
+  })
+
+  it('shows an unmatched model as the vendor typed it', () => {
+    renderModelBid()
+    expect(screen.getByRole('cell', { name: 'IP 1135+' })).toBeInTheDocument()
+  })
+
+  it('places In Stock and Held after the recognised columns, and the sales figures before Selling Price', () => {
+    renderModelBid()
+    const labels = screen
+      .getAllByRole('columnheader')
+      .map((header) => header.textContent?.split('(')[0]?.trim() ?? '')
+      .filter((label) => label !== '')
+    const modelAt = labels.indexOf('Model')
+    expect(labels.slice(modelAt, modelAt + 4)).toEqual(['Model', 'In Stock', 'Held', 'Location'])
+    const sellingAt = labels.indexOf('Selling Price')
+    expect(labels.slice(sellingAt - 3, sellingAt)).toEqual([
+      'Median Sale Price',
+      'Sales',
+      'Price History',
+    ])
+  })
+
+  it("shows the matched model's figures and leaves an unmatched row blank", () => {
+    renderModelBid()
+    const [, matchedRow, unmatchedRow] = screen.getAllByRole('row')
+    expect(matchedRow).toHaveTextContent('$650.00')
+    expect(unmatchedRow).not.toHaveTextContent('$650.00')
+  })
+
+  it('links a matched row to its price history at the selected window', () => {
+    renderModelBid()
+    expect(
+      screen.getByRole('link', { name: `Price history for ${MATCHED_MODEL.name}` }),
+    ).toHaveAttribute('href', expect.stringContaining(`model=${MATCHED_MODEL.id}`))
+    expect(screen.getAllByRole('link', { name: /Price history for/ })).toHaveLength(1)
+  })
+
+  it('shows the sales window toggle', () => {
+    renderPage(BID_STATUS.DRAFT)
+    expect(screen.getByRole('radio', { name: '12 mo' })).toBeInTheDocument()
   })
 
   it('locks the rows once the bid is in review', () => {

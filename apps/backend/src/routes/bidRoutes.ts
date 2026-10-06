@@ -4,6 +4,7 @@ import {
   createBid,
   deleteBid,
   getBidDetail,
+  getBidModelStock,
   getBids,
   patchBidColumns,
   patchBidMetadata,
@@ -16,7 +17,11 @@ import {
 } from '../controllers/bidController.js'
 import { requireAuth } from '../middleware/requireAuth.js'
 import { requirePermission } from '../middleware/requirePermission.js'
-import { BidListQuerySchema, validateQuery } from '../middleware/validation.js'
+import {
+  BidListQuerySchema,
+  BidModelStockQuerySchema,
+  validateQuery,
+} from '../middleware/validation.js'
 
 const BID_PERMISSION = 'create_update_purchase_bids'
 
@@ -28,6 +33,7 @@ router.use(requirePermission(BID_PERMISSION))
 router.get('/', validateQuery(BidListQuerySchema), getBids)
 router.post('/', createBid)
 router.get('/:bidNumber', getBidDetail)
+router.get('/:bidNumber/model-stock', validateQuery(BidModelStockQuerySchema), getBidModelStock)
 router.patch('/:bidNumber/metadata', patchBidMetadata)
 router.delete('/:bidNumber', deleteBid)
 router.post('/:bidNumber/upload', uploadBidRows)

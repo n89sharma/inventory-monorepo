@@ -1,7 +1,12 @@
 import {
+  BID_COLUMN_ROLE,
   BID_STATUS,
   BidColumnRoleSchema,
   classifyBidColumns,
+  median,
+  normalizeName,
+  type BidModelStock,
+  type BidRowModel,
   type BidColumnMapping,
   type BidMetadata,
   type CreateBid,
@@ -24,12 +29,14 @@ import {
   summariseBidRows,
   type BidRowPricingInput,
 } from '../lib/bid-pricing.js'
+import { bidModelLookupKey } from '../lib/bid-model-matching.js'
 import { toYmd, toYmdOrNull, todayYmd } from '../lib/date-only.js'
 import { getNextSequence } from '../lib/db-utils.js'
 import { decimalToNumber } from '../lib/decimal.js'
 import { ConflictError, NotFoundError, ValidationError } from '../lib/errors.js'
 import { pluralize } from '../lib/pluralize.js'
 import { prisma } from '../prisma.js'
+import { querySalePriceGroups, queryStockRows } from './stockSalesService.js'
 
 const BID_NUMBER_PREFIX = 'B-'
 const BID_NUMBER_PAD = 7
@@ -129,7 +136,11 @@ function noBidAware(row: BidRowPricingInput, value: Prisma.Decimal | null): numb
   return row.zero_priced ? null : decimalToNumber(value)
 }
 
-function toBidRowDto(row: StoredBidRow, defaults: BidDefaults): BidRowDto {
+function toBidRowDto(
+  row: StoredBidRow,
+  defaults: BidDefaults,
+  model: BidRowModel | null,
+): BidRowDto {
   const resolved = withBidDefaults(row, defaults)
   return {
     id: row.id,
@@ -144,7 +155,54 @@ function toBidRowDto(row: StoredBidRow, defaults: BidDefaults): BidRowDto {
     bid_price: noBidAware(row, row.bid_price),
     total_cost: noBidAware(row, row.total_cost),
     margin_amount: decimalToNumber(calculateBidRowMargin(row)),
+    model,
   }
+}
+
+type BidSheetForMatching = {
+  headers: string[]
+  column_mappings: { column_index: number; role: string }[]
+  rows: { id: number; cells: string[] }[]
+}
+
+async function matchBidRowModels(sheet: BidSheetForMatching): Promise<Map<number, BidRowModel>> {
+  const columns = classifyBidColumns(sheet.headers, sheet.column_mappings.map(toColumnMappingDto))
+  const modelColumn = columns.find((column) => column.role === BID_COLUMN_ROLE.MODEL)
+  const brandColumn = columns.find((column) => column.role === BID_COLUMN_ROLE.BRAND)
+  if (modelColumn === undefined) return new Map()
+
+  const brands = await prisma.brand.findMany({ select: { name: true } })
+  const brandNames = brands.map((brand) => brand.name)
+  const keyedRows = sheet.rows.flatMap((row) => {
+    const key = bidModelLookupKey(row.cells[modelColumn.index] ?? '', brandNames)
+    if (key === null) return []
+    const brandCell = brandColumn === undefined ? null : (row.cells[brandColumn.index] ?? '')
+    return [{ rowId: row.id, key, brand: brandCell === null ? null : normalizeName(brandCell) }]
+  })
+  if (keyedRows.length === 0) return new Map()
+
+  const models = await prisma.model.findMany({
+    where: { name_normalized: { in: [...new Set(keyedRows.map((row) => row.key))] } },
+    select: {
+      id: true,
+      name: true,
+      name_normalized: true,
+      brand: { select: { name_normalized: true } },
+    },
+  })
+  const matches = new Map<number, BidRowModel>()
+  for (const row of keyedRows) {
+    const candidates = models.filter(
+      (model) =>
+        model.name_normalized === row.key &&
+        (row.brand === null || model.brand.name_normalized === row.brand),
+    )
+    const [onlyModel, ...otherModels] = candidates
+    if (onlyModel !== undefined && otherModels.length === 0) {
+      matches.set(row.rowId, { id: onlyModel.id, name: onlyModel.name })
+    }
+  }
+  return matches
 }
 
 export async function getBidSummaries(
@@ -183,6 +241,7 @@ export async function getBid(bidNumber: string): Promise<BidDetail> {
   })
   if (!bid) throw notFound(bidNumber)
   const totals = summariseBidRows(bid.rows.map((row) => withBidDefaults(row, bid)))
+  const models = await matchBidRowModels(bid)
   return {
     bid_number: bid.bid_number,
     status: bid.status,
@@ -199,10 +258,59 @@ export async function getBid(bidNumber: string): Promise<BidDetail> {
     margin_percent: bid.margin_percent.toNumber(),
     transport_cost: bid.transport_cost.toNumber(),
     headers: bid.headers,
-    rows: bid.rows.map((row) => toBidRowDto(row, bid)),
+    rows: bid.rows.map((row) => toBidRowDto(row, bid, models.get(row.id) ?? null)),
     column_mappings: bid.column_mappings.map(toColumnMappingDto),
     totals,
   }
+}
+
+export async function getBidModelStock(
+  bidNumber: string,
+  salesFrom: string,
+): Promise<BidModelStock[]> {
+  const bid = await prisma.bid.findUnique({
+    where: { bid_number: bidNumber },
+    select: {
+      headers: true,
+      column_mappings: { select: COLUMN_MAPPING_SELECT },
+      rows: { select: { id: true, cells: true } },
+    },
+  })
+  if (!bid) throw notFound(bidNumber)
+  const modelIds = new Set([...(await matchBidRowModels(bid)).values()].map((model) => model.id))
+  if (modelIds.size === 0) return []
+
+  const [stockRows, salePriceGroups] = await Promise.all([
+    queryStockRows(),
+    querySalePriceGroups(salesFrom),
+  ])
+  const stockByModel = new Map<number, BidModelStock & { sale_prices: number[] }>(
+    [...modelIds].map((modelId) => [
+      modelId,
+      {
+        model_id: modelId,
+        in_stock_count: 0,
+        held_count: 0,
+        median_sale_price: null,
+        sales_count: 0,
+        sale_prices: [],
+      },
+    ]),
+  )
+  for (const row of stockRows) {
+    const stock = stockByModel.get(row.model_id)
+    if (stock === undefined) continue
+    stock.in_stock_count += row.in_stock_count ?? 0
+    stock.held_count += row.held_count ?? 0
+  }
+  for (const group of salePriceGroups) {
+    stockByModel.get(group.model_id)?.sale_prices.push(...(group.sale_prices ?? []))
+  }
+  return [...stockByModel.values()].map(({ sale_prices, ...stock }) => ({
+    ...stock,
+    median_sale_price: median(sale_prices),
+    sales_count: sale_prices.length,
+  }))
 }
 
 export async function createBid(bid: CreateBid, userId: number): Promise<string> {

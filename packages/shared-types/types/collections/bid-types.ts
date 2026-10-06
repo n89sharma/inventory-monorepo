@@ -52,6 +52,9 @@ export const BidSummarySchema = z.object({
 })
 export type BidSummary = z.infer<typeof BidSummarySchema>
 
+export const BidRowModelSchema = z.object({ id: z.number().int(), name: z.string() })
+export type BidRowModel = z.infer<typeof BidRowModelSchema>
+
 export const BidRowSchema = z.object({
   id: z.number().int(),
   cells: z.array(z.string()),
@@ -65,6 +68,7 @@ export const BidRowSchema = z.object({
   bid_price: z.number().nullable(),
   total_cost: z.number().nullable(),
   margin_amount: z.number().nullable(),
+  model: BidRowModelSchema.nullable(),
 })
 export type BidRow = z.infer<typeof BidRowSchema>
 
@@ -155,6 +159,15 @@ export const UpdateBidColumnMappingsSchema = z
     { message: 'Each column can be mapped once' },
   )
 export type UpdateBidColumnMappings = z.infer<typeof UpdateBidColumnMappingsSchema>
+
+export const BidModelStockSchema = z.object({
+  model_id: z.number().int(),
+  in_stock_count: z.number().int(),
+  held_count: z.number().int(),
+  median_sale_price: z.number().nullable(),
+  sales_count: z.number().int(),
+})
+export type BidModelStock = z.infer<typeof BidModelStockSchema>
 
 export const ConcludeBidSchema = z.object({ outcome: BidOutcomeSchema })
 export type ConcludeBid = z.infer<typeof ConcludeBidSchema>

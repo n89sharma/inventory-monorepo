@@ -2,6 +2,7 @@ import { Request, Response } from 'express'
 import {
   ApiResponse,
   BidDetail,
+  BidModelStock,
   BidSummary,
   BidMetadataSchema,
   CreateBidSchema,
@@ -14,12 +15,13 @@ import {
 } from 'shared-types'
 import { z } from 'zod'
 import { asyncHandler } from '../lib/asyncHandler.js'
-import { BidListQuerySchema } from '../middleware/validation.js'
+import { BidListQuerySchema, BidModelStockQuerySchema } from '../middleware/validation.js'
 import {
   concludeBid as concludeBidSer,
   createBid as createBidSer,
   deleteBid as deleteBidSer,
   getBid as getBidSer,
+  getBidModelStock as getBidModelStockSer,
   getBidSummaries as getBidSummariesSer,
   removeBidRows as removeBidRowsSer,
   returnBidToDraft as returnBidToDraftSer,
@@ -68,6 +70,14 @@ export const uploadBidRows = asyncHandler(
     const upload = UploadBidRowsSchema.parse(req.body)
     const bid = await uploadBidRowsSer(req.params.bidNumber, upload)
     res.json(successResponse(bid))
+  },
+)
+
+export const getBidModelStock = asyncHandler(
+  async (req: Request, res: Response<ApiResponse<BidModelStock[]>>) => {
+    const { salesFrom } = res.locals.query as z.infer<typeof BidModelStockQuerySchema>
+    const stock = await getBidModelStockSer(req.params.bidNumber, salesFrom)
+    res.json(successResponse(stock))
   },
 )
 

@@ -8,6 +8,7 @@ import {
 } from '@/ui-types/select-option-types'
 import type {
   BidDetail,
+  BidModelStock,
   BidMetadata,
   BidOutcome,
   BidSummary,
@@ -21,6 +22,7 @@ import type {
 } from 'shared-types'
 import {
   BidDetailSchema,
+  BidModelStockSchema,
   BidMetadataSchema,
   BidSummarySchema,
   ConcludeBidSchema,
@@ -31,6 +33,8 @@ import {
   UploadBidRowsSchema,
 } from 'shared-types'
 import { z } from 'zod'
+
+const BidModelStockListSchema = z.array(BidModelStockSchema)
 
 const CreateBidResponseSchema = z.object({ bidNumber: z.string() })
 type CreateBidResponse = z.infer<typeof CreateBidResponseSchema>
@@ -82,6 +86,16 @@ export async function updateBidMetadata(bidNumber: string, form: BidForm): Promi
 
 export async function deleteBid(bidNumber: string): Promise<void> {
   await api.delete(`/bids/${bidNumber}`)
+}
+
+export async function getBidModelStock(
+  bidNumber: string,
+  salesFrom: string,
+): Promise<BidModelStock[]> {
+  const { data } = await api.get<BidModelStock[]>(`/bids/${bidNumber}/model-stock`, {
+    params: { salesFrom },
+  })
+  return BidModelStockListSchema.parse(data)
 }
 
 export async function uploadBidRows(bidNumber: string, upload: UploadBidRows): Promise<BidDetail> {

@@ -13,6 +13,7 @@ const mocks = vi.hoisted(() => ({
   updateBidColumnMappings: vi.fn(),
   uploadBidRows: vi.fn(),
   invalidateBidLists: vi.fn(),
+  invalidateBidModelStock: vi.fn(),
   mutate: vi.fn(),
   toastSuccess: vi.fn(),
 }))
@@ -35,6 +36,7 @@ vi.mock('@/hooks/use-bid', () => ({
   bidDetailKey: (bidNumber: string) => `bid:${bidNumber}`,
   clearBidDetail: vi.fn(),
   invalidateBidLists: mocks.invalidateBidLists,
+  invalidateBidModelStock: mocks.invalidateBidModelStock,
 }))
 
 vi.mock('swr', () => ({ mutate: mocks.mutate }))
@@ -118,6 +120,7 @@ describe('use-bid-mutations', () => {
 
     expect(mocks.mutate).toHaveBeenCalledWith(`bid:${BID_NUMBER}`, DETAIL, { revalidate: false })
     expect(mocks.invalidateBidLists).toHaveBeenCalledOnce()
+    expect(mocks.invalidateBidModelStock).toHaveBeenCalledWith(BID_NUMBER)
   })
 
   it('puts the returned detail into the cache after an upload', async () => {
@@ -126,6 +129,7 @@ describe('use-bid-mutations', () => {
     await mutations.upload(BID_NUMBER, { headers: ['Serial'], rows: [['S1']] })
 
     expect(mocks.mutate).toHaveBeenCalledWith(`bid:${BID_NUMBER}`, DETAIL, { revalidate: false })
+    expect(mocks.invalidateBidModelStock).toHaveBeenCalledWith(BID_NUMBER)
   })
 
   it('hides removed rows at once and deletes them once the undo window passes', async () => {

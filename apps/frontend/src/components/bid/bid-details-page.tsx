@@ -39,7 +39,9 @@ import { DeleteEntityDialog } from '@/components/shared/delete-entity-dialog'
 import { TableTextFilter } from '@/components/shared/filters/table-text-filter'
 import { ColumnPickerPopover } from '@/components/shared/column-picker-button'
 import { TableToolbarEnd } from '@/components/shared/table-toolbar'
-import { useBidDetail } from '@/hooks/use-bid'
+import { SalesWindowToggle } from '@/components/shared/filters/sales-window-toggle'
+import { useSalesWindowParam } from '@/lib/filters/hooks'
+import { useBidDetail, useBidModelStock } from '@/hooks/use-bid'
 import { useBidMutations } from '@/hooks/use-bid-mutations'
 import { useEntityDelete } from '@/hooks/use-entity-delete'
 import { labelBidColumns } from '@/lib/bid-column-labels'
@@ -55,7 +57,7 @@ import { bidCsvColumns, bidCsvFilename } from '@/lib/bid-csv'
 import { toCsv } from '@/lib/csv'
 import { downloadFile } from '@/lib/download-file'
 import { ExportCsvButton } from '@/components/shared/export-csv-button'
-import { BID_STATUS, type BidDetail, type BidRow } from 'shared-types'
+import { BID_STATUS, type BidDetail, type BidModelStock, type BidRow } from 'shared-types'
 
 const TABLE_LABEL = 'Bid rows'
 const ROW_NOUN = 'row'
@@ -68,6 +70,7 @@ const BID_ROW_TEXT_SEARCH = {
 const getBidRowId = (row: BidRow) => String(row.id)
 
 const CSV_MIME_TYPE = 'text/csv'
+const NO_MODEL_STOCK: BidModelStock[] = []
 const SENT_STATUSES: string[] = [BID_STATUS.SUBMITTED, BID_STATUS.CONCLUDED]
 
 type ReviewBlocker = { badge: string; reason: string }
@@ -187,8 +190,17 @@ function BidDetailsContent({ bid }: { bid: BidDetail }): React.JSX.Element {
     () => (isDraft ? { editorRegistry, saveField, toggleZeroPrice } : undefined),
     [isDraft, editorRegistry, saveField, toggleZeroPrice],
   )
+  const [months, setMonths] = useSalesWindowParam()
+  const { data: modelStock = NO_MODEL_STOCK } = useBidModelStock(bidNumber, months)
+  const stockLookup = useMemo(
+    () => ({ byModel: new Map(modelStock.map((stock) => [stock.model_id, stock])), months }),
+    [modelStock, months],
+  )
   const sheetColumns = useMemo(() => labelBidColumns(bid), [bid])
-  const columns = useMemo(() => buildBidGridColumns(sheetColumns, editing), [sheetColumns, editing])
+  const columns = useMemo(
+    () => buildBidGridColumns(sheetColumns, editing, stockLookup),
+    [sheetColumns, editing, stockLookup],
+  )
   const pickerColumns = useMemo(() => bidPickerColumns(sheetColumns), [sheetColumns])
   const visibleColumnIds = new Set(
     pickerColumns.filter((column) => !hiddenColumnIds.has(column.id)).map((column) => column.id),
@@ -319,6 +331,11 @@ function BidDetailsContent({ bid }: { bid: BidDetail }): React.JSX.Element {
         columnVisibility={columnVisibility}
         renderToolbar={(table) => (
           <TableToolbarEnd>
+            <SalesWindowToggle
+              months={months}
+              onMonthsChange={setMonths}
+              getLabel={(option) => `${option} mo`}
+            />
             <TableTextFilter
               table={table}
               placeholder="Search rows"

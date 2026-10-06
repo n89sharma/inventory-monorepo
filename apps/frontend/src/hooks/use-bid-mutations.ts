@@ -11,7 +11,12 @@ import {
   updateBidRows,
   uploadBidRows,
 } from '@/data/api/bid-api'
-import { bidDetailKey, clearBidDetail, invalidateBidLists } from '@/hooks/use-bid'
+import {
+  bidDetailKey,
+  clearBidDetail,
+  invalidateBidLists,
+  invalidateBidModelStock,
+} from '@/hooks/use-bid'
 import { flushPendingRemovals, scheduleRemoval } from '@/lib/removal-undo'
 import type { BidForm } from '@/ui-types/bid-form-types'
 import type {
@@ -52,6 +57,7 @@ async function updateMetadata(bidNumber: string, data: BidForm) {
 
 async function upload(bidNumber: string, rows: UploadBidRows) {
   adoptDetail(bidNumber, await uploadBidRows(bidNumber, rows))
+  invalidateBidModelStock(bidNumber)
 }
 
 async function updateRows(bidNumber: string, update: UpdateBidRows) {
@@ -60,6 +66,7 @@ async function updateRows(bidNumber: string, update: UpdateBidRows) {
 
 async function mapColumns(bidNumber: string, update: UpdateBidColumnMappings) {
   adoptDetail(bidNumber, await updateBidColumnMappings(bidNumber, update))
+  invalidateBidModelStock(bidNumber)
 }
 
 function withNoBid(bid: BidDetail, rowId: number, noBid: boolean): BidDetail {

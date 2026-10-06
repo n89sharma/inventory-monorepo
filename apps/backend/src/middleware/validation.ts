@@ -21,6 +21,8 @@ export const ArrivalListQuerySchema = z
     message: 'fromDate must be before toDate',
   })
 
+export const BidModelStockQuerySchema = z.object({ salesFrom: z.iso.date() })
+
 export const BidListQuerySchema = z
   .object({
     fromDate: z.iso.date(),

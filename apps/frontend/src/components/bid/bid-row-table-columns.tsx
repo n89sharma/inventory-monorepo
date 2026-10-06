@@ -1,3 +1,10 @@
+import {
+  onHandColumns,
+  salesColumns,
+  STOCK_SECTION_ID,
+  stockPickerColumns,
+  type BidModelStockLookup,
+} from '@/components/bid/bid-stock-columns'
 import { NO_BID_LABEL, NoBidToggle } from '@/components/bid/no-bid-toggle'
 import type { PickerColumn, PickerSection } from '@/components/shared/column-picker'
 import { EditableAmountCell, type AmountInputProps } from '@/components/shared/editable-amount-cell'
@@ -8,7 +15,7 @@ import { parseBidMeterReading, type LabelledBidColumn } from '@/lib/bid-column-l
 import { formatThousandsK, formatUSDWithSymbol } from '@/lib/formatters'
 import type { PriceCellEditorRegistry } from '@/lib/price-cell-navigation'
 import type { ColumnDef } from '@tanstack/react-table'
-import { BID_COLUMN_ROLE, type BidRow } from 'shared-types'
+import { BID_COLUMN_ROLE, type BidRow, type BidRowModel } from 'shared-types'
 
 const BID_PRICE_FIELDS = ['selling_price', 'transport_cost', 'margin_percent'] as const
 
@@ -43,6 +50,7 @@ const PRICING_SECTION_ID = 'pricing'
 
 export const BID_COLUMN_SECTIONS = [
   { id: SHEET_SECTION_ID, label: 'Vendor Sheet' },
+  { id: STOCK_SECTION_ID, label: 'Stock & Sales' },
   { id: PRICING_SECTION_ID, label: 'Pricing' },
 ] as const satisfies readonly PickerSection[]
 
@@ -55,6 +63,7 @@ const RECOGNIZED_HEADER_CLASS =
 const UNRECOGNIZED_HEADER_CLASS = 'bg-zinc-200 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400'
 
 const NO_BID_ROW_CLASS = 'data-row-muted'
+const MATCHED_MODEL_CLASS = 'font-medium text-emerald-700 dark:text-emerald-400'
 
 export function bidRowClassName(row: BidRow): string | undefined {
   return row.zero_priced ? NO_BID_ROW_CLASS : undefined
@@ -95,6 +104,30 @@ function meterColumn(column: ColumnDef<BidRow>): ColumnDef<BidRow> {
   }
 }
 
+function BidModelCell({
+  model,
+  vendorText,
+}: {
+  model: BidRowModel | null
+  vendorText: string
+}): React.JSX.Element {
+  if (model === null) return <>{vendorText}</>
+  return (
+    <span className={MATCHED_MODEL_CLASS} title={vendorText}>
+      {model.name}
+    </span>
+  )
+}
+
+function modelColumn(column: ColumnDef<BidRow>): ColumnDef<BidRow> {
+  return {
+    ...column,
+    cell: ({ row, getValue }) => (
+      <BidModelCell model={row.original.model} vendorText={String(getValue())} />
+    ),
+  }
+}
+
 function pastedColumn(column: LabelledBidColumn): ColumnDef<BidRow> {
   const definition: ColumnDef<BidRow> = {
     id: pastedColumnId(column),
@@ -105,6 +138,7 @@ function pastedColumn(column: LabelledBidColumn): ColumnDef<BidRow> {
     },
   }
   if (column.role === BID_COLUMN_ROLE.TOTAL_METER) return meterColumn(definition)
+  if (column.role === BID_COLUMN_ROLE.MODEL) return modelColumn(definition)
   return definition
 }
 
@@ -240,9 +274,19 @@ function pricingColumns(editing: BidRowEditing | undefined): ColumnDef<BidRow>[]
 export function buildBidGridColumns(
   sheetColumns: readonly LabelledBidColumn[],
   editing: BidRowEditing | undefined,
+  stock: BidModelStockLookup,
 ): ColumnDef<BidRow>[] {
   const select = editing ? [createSelectColumn<BidRow>()] : []
-  return [...select, ...sheetColumns.map(pastedColumn), ...pricingColumns(editing)]
+  const mapped = sheetColumns.filter((column) => column.role !== null).map(pastedColumn)
+  const unmapped = sheetColumns.filter((column) => column.role === null).map(pastedColumn)
+  return [
+    ...select,
+    ...mapped,
+    ...onHandColumns(stock),
+    ...unmapped,
+    ...salesColumns(stock),
+    ...pricingColumns(editing),
+  ]
 }
 
 export function bidPickerColumns(sheetColumns: readonly LabelledBidColumn[]): PickerColumn[] {
@@ -256,5 +300,5 @@ export function bidPickerColumns(sheetColumns: readonly LabelledBidColumn[]): Pi
     label,
     section: PRICING_SECTION_ID,
   }))
-  return [...pickerSheetColumns, ...pricing]
+  return [...pickerSheetColumns, ...stockPickerColumns(), ...pricing]
 }
