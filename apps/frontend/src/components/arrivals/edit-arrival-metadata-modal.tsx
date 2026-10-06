@@ -1,5 +1,3 @@
-import { useOrgs } from '@/hooks/use-org'
-import { useActiveWarehouses } from '@/hooks/use-active-warehouses'
 import { useUnsavedChangesGuard } from '@/hooks/use-unsaved-changes-guard'
 import { DISCARD_USER_EDITS, KEEP_USER_EDITS_ON_SERVER_REFRESH } from '@/lib/form-reset-options'
 import { flattenFieldErrors } from '@/lib/utils'
@@ -14,9 +12,8 @@ import { Button } from '../shadcn/button'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../shadcn/dialog'
 import { Field, FieldGroup, FieldLabel } from '../shadcn/field'
 import { Textarea } from '../shadcn/textarea'
-import { ControlledSearchSelectInput } from '../shared/search-select/controlled-search-select-input'
-import { SelectOptions } from '../shared/search-select/select-options'
 import { UnsavedChangesDialog } from '../shared/unsaved-changes-dialog'
+import { ArrivalMetadataFields } from './arrival-metadata-fields'
 
 interface EditArrivalMetadataModalProps {
   open: boolean
@@ -31,8 +28,6 @@ export function EditArrivalMetadataModal({
   arrival,
   onSave,
 }: EditArrivalMetadataModalProps): React.JSX.Element {
-  const activeWarehouses = useActiveWarehouses()
-  const orgs = useOrgs()
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const values = useMemo(() => toFormValues(arrival), [arrival])
@@ -75,38 +70,7 @@ export function EditArrivalMetadataModal({
         </DialogHeader>
         <form onSubmit={(e) => e.preventDefault()}>
           <FieldGroup className="grid grid-cols-2 gap-x-6 gap-y-3">
-            <ControlledSearchSelectInput
-              control={form.control}
-              name="vendor"
-              options={orgs}
-              getLabel={(o) => o.name}
-              fieldLabel="Vendor"
-              fieldRequired={true}
-            />
-            <ControlledSearchSelectInput
-              control={form.control}
-              name="transporter"
-              options={orgs}
-              getLabel={(o) => o.name}
-              fieldLabel="Transporter"
-              fieldRequired={true}
-            />
-            <Controller
-              control={form.control}
-              name="warehouse"
-              render={({ field: { onChange, value }, fieldState }) => (
-                <SelectOptions
-                  selection={value}
-                  onSelectionChange={onChange}
-                  options={activeWarehouses}
-                  getLabel={(w) => w.city_code}
-                  fieldLabel="Warehouse"
-                  anyAllowed={false}
-                  fieldRequired={true}
-                  error={fieldState.invalid}
-                />
-              )}
-            />
+            <ArrivalMetadataFields control={form.control} />
             <Controller
               control={form.control}
               name="comment"

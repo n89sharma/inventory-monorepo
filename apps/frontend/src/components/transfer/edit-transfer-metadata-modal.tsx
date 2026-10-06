@@ -1,5 +1,3 @@
-import { useOrgs } from '@/hooks/use-org'
-import { useActiveWarehouses } from '@/hooks/use-active-warehouses'
 import { useUnsavedChangesGuard } from '@/hooks/use-unsaved-changes-guard'
 import { formatDateParam } from '@/lib/date-param'
 import { flattenFieldErrors } from '@/lib/utils'
@@ -19,9 +17,8 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '
 import { Field, FieldGroup, FieldLabel } from '../shadcn/field'
 import { Textarea } from '../shadcn/textarea'
 import { ControlledDatePickerField } from '../shared/date-picker'
-import { ControlledSearchSelectInput } from '../shared/search-select/controlled-search-select-input'
-import { SelectOptions } from '../shared/search-select/select-options'
 import { UnsavedChangesDialog } from '../shared/unsaved-changes-dialog'
+import { TransferMetadataFields } from './transfer-metadata-fields'
 
 interface EditTransferMetadataModalProps {
   open: boolean
@@ -40,8 +37,6 @@ export function EditTransferMetadataModal({
   onSaveNotes,
   onSaveDate,
 }: EditTransferMetadataModalProps): React.JSX.Element {
-  const activeWarehouses = useActiveWarehouses()
-  const orgs = useOrgs()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const today = startOfDay(new Date())
   const canEditMetadata = transfer.status === TRANSFER_STATUS.DRAFT
@@ -95,46 +90,7 @@ export function EditTransferMetadataModal({
         <form onSubmit={(e) => e.preventDefault()}>
           <FieldGroup className="grid grid-cols-2 gap-x-6 gap-y-3">
             <fieldset disabled={!canEditMetadata} className="contents">
-              <Controller
-                control={form.control}
-                name="origin"
-                render={({ field: { onChange, value }, fieldState }) => (
-                  <SelectOptions
-                    selection={value}
-                    onSelectionChange={onChange}
-                    options={activeWarehouses}
-                    getLabel={(w) => w.city_code}
-                    fieldLabel="Origin"
-                    anyAllowed={false}
-                    fieldRequired={true}
-                    error={fieldState.invalid}
-                  />
-                )}
-              />
-              <Controller
-                control={form.control}
-                name="destination"
-                render={({ field: { onChange, value }, fieldState }) => (
-                  <SelectOptions
-                    selection={value}
-                    onSelectionChange={onChange}
-                    options={activeWarehouses}
-                    getLabel={(w) => w.city_code}
-                    fieldLabel="Destination"
-                    anyAllowed={false}
-                    fieldRequired={true}
-                    error={fieldState.invalid}
-                  />
-                )}
-              />
-              <ControlledSearchSelectInput
-                control={form.control}
-                name="transporter"
-                options={orgs}
-                getLabel={(o) => o.name}
-                fieldLabel="Transporter"
-                fieldRequired={true}
-              />
+              <TransferMetadataFields control={form.control} />
             </fieldset>
             <ControlledDatePickerField
               control={form.control}

@@ -1,5 +1,3 @@
-import { useOrgs } from '@/hooks/use-org'
-import { useActiveUsers } from '@/hooks/use-active-users'
 import { useUnsavedChangesGuard } from '@/hooks/use-unsaved-changes-guard'
 import { flattenFieldErrors } from '@/lib/utils'
 import { HoldMetadataFormSchema, type HoldMetadataForm } from '@/ui-types/hold-form-types'
@@ -13,9 +11,8 @@ import { Button } from '../shadcn/button'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../shadcn/dialog'
 import { Field, FieldGroup, FieldLabel } from '../shadcn/field'
 import { Textarea } from '../shadcn/textarea'
-import { ControlledSearchSelectInput } from '../shared/search-select/controlled-search-select-input'
-import { ControlledSelectOptionSearchSelect } from '../shared/search-select/controlled-select-option-search-select'
 import { UnsavedChangesDialog } from '../shared/unsaved-changes-dialog'
+import { HoldMetadataFields } from './hold-metadata-fields'
 
 interface EditHoldMetadataModalProps {
   open: boolean
@@ -30,8 +27,6 @@ export function EditHoldMetadataModal({
   hold,
   onSave,
 }: EditHoldMetadataModalProps): React.JSX.Element {
-  const activeUsers = useActiveUsers()
-  const orgs = useOrgs()
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const values = useMemo(() => toFormValues(hold), [hold])
@@ -71,22 +66,7 @@ export function EditHoldMetadataModal({
         </DialogHeader>
         <form onSubmit={(e) => e.preventDefault()}>
           <FieldGroup className="grid grid-cols-2 gap-x-6 gap-y-3">
-            <ControlledSelectOptionSearchSelect
-              control={form.control}
-              name="created_for"
-              options={activeUsers}
-              getLabel={(u) => u.name}
-              fieldLabel="Created For"
-              fieldRequired={true}
-            />
-            <ControlledSearchSelectInput
-              control={form.control}
-              name="customer"
-              options={orgs}
-              getLabel={(o) => o.name}
-              fieldLabel="Customer"
-              fieldRequired={true}
-            />
+            <HoldMetadataFields control={form.control} />
             <Controller
               control={form.control}
               name="notes"

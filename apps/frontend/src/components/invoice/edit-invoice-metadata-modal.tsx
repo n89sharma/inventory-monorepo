@@ -1,23 +1,20 @@
-import { useOrgs } from '@/hooks/use-org'
 import { useUnsavedChangesGuard } from '@/hooks/use-unsaved-changes-guard'
 import { formatTitleCase } from '@/lib/formatters'
 import { flattenFieldErrors } from '@/lib/utils'
 import { InvoiceMetadataFormSchema, type InvoiceMetadataForm } from '@/ui-types/invoice-form-types'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { parseISO, startOfDay } from 'date-fns'
+import { parseISO } from 'date-fns'
 import { useMemo, useState } from 'react'
 import { Controller, useForm, type FieldErrors } from 'react-hook-form'
 import { INVOICE_TYPE, type InvoiceDetail } from 'shared-types'
 import { toast } from 'sonner'
 import { Button } from '../shadcn/button'
-import { Checkbox } from '../shadcn/checkbox'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../shadcn/dialog'
-import { Field, FieldError, FieldGroup, FieldLabel } from '../shadcn/field'
+import { Field, FieldGroup, FieldLabel } from '../shadcn/field'
 import { Input } from '../shadcn/input'
 import { Textarea } from '../shadcn/textarea'
-import { ControlledDatePickerField } from '../shared/date-picker'
-import { ControlledSearchSelectInput } from '../shared/search-select/controlled-search-select-input'
 import { UnsavedChangesDialog } from '../shared/unsaved-changes-dialog'
+import { InvoiceMetadataFields } from './invoice-metadata-fields'
 
 interface EditInvoiceMetadataModalProps {
   open: boolean
@@ -32,9 +29,7 @@ export function EditInvoiceMetadataModal({
   invoice,
   onSave,
 }: EditInvoiceMetadataModalProps): React.JSX.Element {
-  const orgs = useOrgs()
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const today = startOfDay(new Date())
 
   const values = useMemo(() => toFormValues(invoice), [invoice])
   const form = useForm<InvoiceMetadataForm>({
@@ -77,50 +72,15 @@ export function EditInvoiceMetadataModal({
               <FieldLabel>Invoice Number</FieldLabel>
               <Input value={invoice.invoice_number} disabled readOnly />
             </Field>
-            <Controller
-              control={form.control}
-              name="invoice_reference"
-              render={({ field, fieldState }) => (
-                <Field>
-                  <FieldLabel>Invoice Reference</FieldLabel>
-                  <Input placeholder="e.g. INV-001" aria-invalid={fieldState.invalid} {...field} />
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                </Field>
-              )}
-            />
             <Field>
               <FieldLabel>Invoice Type</FieldLabel>
               <Input value={formatTitleCase(invoice.invoice_type.type)} disabled readOnly />
             </Field>
-            <ControlledDatePickerField
+            <InvoiceMetadataFields
               control={form.control}
-              name="invoice_date"
-              label="Invoice Date"
-              className="self-end pb-0.5"
-              disabled={{ after: today }}
-              endMonth={today}
-            />
-            <ControlledSearchSelectInput
-              control={form.control}
-              name="organization"
-              options={orgs}
-              getLabel={(o) => o.name}
-              fieldLabel={invoice.invoice_type.type === INVOICE_TYPE.sales ? 'Customer' : 'Vendor'}
-              fieldRequired={true}
-            />
-            <Controller
-              control={form.control}
-              name="is_cleared"
-              render={({ field }) => (
-                <Field orientation="horizontal" className="w-fit items-center gap-2 self-end pb-2">
-                  <Checkbox
-                    id="is_cleared"
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
-                  <FieldLabel htmlFor="is_cleared">Cleared</FieldLabel>
-                </Field>
-              )}
+              organizationLabel={
+                invoice.invoice_type.type === INVOICE_TYPE.sales ? 'Customer' : 'Vendor'
+              }
             />
             <Controller
               control={form.control}

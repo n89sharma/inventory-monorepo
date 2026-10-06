@@ -1,6 +1,3 @@
-import { useOrgs } from '@/hooks/use-org'
-import { useActiveUsers } from '@/hooks/use-active-users'
-import { useActiveWarehouses } from '@/hooks/use-active-warehouses'
 import { useUnsavedChangesGuard } from '@/hooks/use-unsaved-changes-guard'
 import { formatDateParam } from '@/lib/date-param'
 import { flattenFieldErrors } from '@/lib/utils'
@@ -20,10 +17,8 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '
 import { Field, FieldGroup, FieldLabel } from '../shadcn/field'
 import { Textarea } from '../shadcn/textarea'
 import { ControlledDatePickerField } from '../shared/date-picker'
-import { ControlledSearchSelectInput } from '../shared/search-select/controlled-search-select-input'
-import { ControlledSelectOptionSearchSelect } from '../shared/search-select/controlled-select-option-search-select'
-import { SelectOptions } from '../shared/search-select/select-options'
 import { UnsavedChangesDialog } from '../shared/unsaved-changes-dialog'
+import { DepartureMetadataFields } from './departure-metadata-fields'
 
 interface EditDepartureMetadataModalProps {
   open: boolean
@@ -42,9 +37,6 @@ export function EditDepartureMetadataModal({
   onSaveNotes,
   onSaveDate,
 }: EditDepartureMetadataModalProps): React.JSX.Element {
-  const activeWarehouses = useActiveWarehouses()
-  const activeUsers = useActiveUsers()
-  const orgs = useOrgs()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const today = startOfDay(new Date())
   const canEditMetadata = departure.status === DEPARTURE_STATUS.DRAFT
@@ -98,46 +90,7 @@ export function EditDepartureMetadataModal({
         <form onSubmit={(e) => e.preventDefault()}>
           <FieldGroup className="grid grid-cols-2 gap-x-6 gap-y-3">
             <fieldset disabled={!canEditMetadata} className="contents">
-              <Controller
-                control={form.control}
-                name="origin"
-                render={({ field: { onChange, value }, fieldState }) => (
-                  <SelectOptions
-                    selection={value}
-                    onSelectionChange={onChange}
-                    options={activeWarehouses}
-                    getLabel={(w) => w.city_code}
-                    fieldLabel="Origin"
-                    anyAllowed={false}
-                    fieldRequired={true}
-                    error={fieldState.invalid}
-                  />
-                )}
-              />
-              <ControlledSearchSelectInput
-                control={form.control}
-                name="customer"
-                options={orgs}
-                getLabel={(o) => o.name}
-                fieldLabel="Customer"
-                fieldRequired={true}
-              />
-              <ControlledSearchSelectInput
-                control={form.control}
-                name="transporter"
-                options={orgs}
-                getLabel={(o) => o.name}
-                fieldLabel="Transporter"
-                fieldRequired={true}
-              />
-              <ControlledSelectOptionSearchSelect
-                control={form.control}
-                name="salesperson"
-                options={activeUsers}
-                getLabel={(u) => u.name}
-                fieldLabel="Salesperson"
-                fieldRequired={true}
-              />
+              <DepartureMetadataFields control={form.control} />
             </fieldset>
             <ControlledDatePickerField
               control={form.control}
