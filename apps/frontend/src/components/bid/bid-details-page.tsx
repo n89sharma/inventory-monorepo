@@ -8,7 +8,11 @@ import {
   type BidPriceField,
   type BidRowEditing,
 } from '@/components/bid/bid-row-table-columns'
-import { stockPickerColumns } from '@/components/bid/bid-stock-columns'
+import {
+  stockPickerColumns,
+  withModelStock,
+  type BidRowWithStock,
+} from '@/components/bid/bid-stock-columns'
 import { BidLifecycleActions } from '@/components/bid/bid-lifecycle-actions'
 import { BidOutcomeBadge, BidStatusBadge, BidWarningBadge } from '@/components/bid/bid-status-badge'
 import { BidTotalsStrip } from '@/components/bid/bid-totals-strip'
@@ -68,7 +72,7 @@ const ENTITY_LABEL = 'Bid'
 
 const BID_ROW_TEXT_SEARCH = {
   getColumnCanGlobalFilter: (column) => isPastedColumnId(column.id),
-} as const satisfies Pick<TableOptions<BidRow>, 'getColumnCanGlobalFilter'>
+} as const satisfies Pick<TableOptions<BidRowWithStock>, 'getColumnCanGlobalFilter'>
 
 const getBidRowId = (row: BidRow) => String(row.id)
 
@@ -215,14 +219,11 @@ function BidDetailsContent({ bid }: { bid: BidDetail }): React.JSX.Element {
   )
   const [months, setMonths] = useSalesWindowParam()
   const { data: modelStock = NO_MODEL_STOCK } = useBidModelStock(bidNumber, months)
-  const stockLookup = useMemo(
-    () => ({ byModel: new Map(modelStock.map((stock) => [stock.model_id, stock])), months }),
-    [modelStock, months],
-  )
+  const rows = useMemo(() => withModelStock(bid.rows, modelStock), [bid.rows, modelStock])
   const sheetColumns = useMemo(() => labelBidColumns(bid), [bid])
   const columns = useMemo(
-    () => buildBidGridColumns(sheetColumns, editing, stockLookup),
-    [sheetColumns, editing, stockLookup],
+    () => buildBidGridColumns(sheetColumns, editing, months),
+    [sheetColumns, editing, months],
   )
   const pickerColumns = useMemo(() => bidPickerColumns(sheetColumns), [sheetColumns])
   const visibleColumnIds = new Set(
@@ -356,7 +357,7 @@ function BidDetailsContent({ bid }: { bid: BidDetail }): React.JSX.Element {
       <DataGridWithoutResultCount
         label={TABLE_LABEL}
         columns={columns}
-        data={bid.rows}
+        data={rows}
         getRowId={getBidRowId}
         getRowClassName={bidRowClassName}
         textSearch={BID_ROW_TEXT_SEARCH}

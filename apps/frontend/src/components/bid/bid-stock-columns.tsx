@@ -21,23 +21,27 @@ const STOCK_CELL_CLASS = 'text-center tabular-nums'
 const STOCK_HEADER_CLASS = 'bg-violet-100 text-violet-900 dark:bg-violet-950 dark:text-violet-100'
 const STOCK_COLUMN_META = { cellClassName: STOCK_CELL_CLASS, headerClassName: STOCK_HEADER_CLASS }
 
-export type BidModelStockLookup = {
-  byModel: ReadonlyMap<number, BidModelStock>
-  months: SalesWindowMonths
+export type BidRowWithStock = BidRow & { model_stock: BidModelStock | null }
+
+export function withModelStock(
+  rows: readonly BidRow[],
+  modelStock: readonly BidModelStock[],
+): BidRowWithStock[] {
+  const stockByModel = new Map(modelStock.map((stock) => [stock.model_id, stock]))
+  return rows.map((row) => ({
+    ...row,
+    model_stock: row.model === null ? null : (stockByModel.get(row.model.id) ?? null),
+  }))
 }
 
 function figureColumn(
   figure: StockFigure,
-  lookup: BidModelStockLookup,
   format: (value: number) => string,
-): ColumnDef<BidRow> {
+): ColumnDef<BidRowWithStock> {
   return {
     id: figure,
     header: STOCK_COLUMN_LABELS[figure],
-    accessorFn: (row) => {
-      if (row.model === null) return undefined
-      return lookup.byModel.get(row.model.id)?.[figure] ?? undefined
-    },
+    accessorFn: (row) => row.model_stock?.[figure] ?? undefined,
     sortUndefined: 'last',
     cell: ({ getValue }) => {
       const value = getValue<number | undefined>()
@@ -47,7 +51,7 @@ function figureColumn(
   }
 }
 
-function priceHistoryColumn(lookup: BidModelStockLookup): ColumnDef<BidRow> {
+function priceHistoryColumn(months: SalesWindowMonths): ColumnDef<BidRowWithStock> {
   return {
     id: 'price_history',
     header: STOCK_COLUMN_LABELS.price_history,
@@ -56,25 +60,20 @@ function priceHistoryColumn(lookup: BidModelStockLookup): ColumnDef<BidRow> {
     cell: ({ row }) => {
       const { model } = row.original
       if (model === null) return null
-      return (
-        <ModelPriceHistoryLink modelId={model.id} modelName={model.name} months={lookup.months} />
-      )
+      return <ModelPriceHistoryLink modelId={model.id} modelName={model.name} months={months} />
     },
   }
 }
 
-export function onHandColumns(lookup: BidModelStockLookup): ColumnDef<BidRow>[] {
-  return [
-    figureColumn('in_stock_count', lookup, String),
-    figureColumn('held_count', lookup, String),
-  ]
+export function onHandColumns(): ColumnDef<BidRowWithStock>[] {
+  return [figureColumn('in_stock_count', String), figureColumn('held_count', String)]
 }
 
-export function salesColumns(lookup: BidModelStockLookup): ColumnDef<BidRow>[] {
+export function salesColumns(months: SalesWindowMonths): ColumnDef<BidRowWithStock>[] {
   return [
-    figureColumn('median_sale_price', lookup, formatUSDWithSymbol),
-    figureColumn('sales_count', lookup, String),
-    priceHistoryColumn(lookup),
+    figureColumn('median_sale_price', formatUSDWithSymbol),
+    figureColumn('sales_count', String),
+    priceHistoryColumn(months),
   ]
 }
 

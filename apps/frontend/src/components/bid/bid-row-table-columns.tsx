@@ -3,7 +3,7 @@ import {
   salesColumns,
   STOCK_SECTION_ID,
   stockPickerColumns,
-  type BidModelStockLookup,
+  type BidRowWithStock,
 } from '@/components/bid/bid-stock-columns'
 import { NO_BID_LABEL, NoBidToggle } from '@/components/bid/no-bid-toggle'
 import type { PickerColumn, PickerSection } from '@/components/shared/column-picker'
@@ -11,6 +11,7 @@ import { EditableAmountCell, type AmountInputProps } from '@/components/shared/e
 import { PercentInput } from '@/components/shared/percent-input'
 import { PriceInput } from '@/components/shared/price-input'
 import { createSelectColumn } from '@/components/table-columns/column-primitives'
+import type { SalesWindowMonths } from '@/lib/filters/parsers'
 import { parseBidMeterReading, type LabelledBidColumn } from '@/lib/bid-column-labels'
 import { formatThousandsK, formatUSDWithSymbol } from '@/lib/formatters'
 import type { PriceCellEditorRegistry } from '@/lib/price-cell-navigation'
@@ -91,7 +92,7 @@ function meterReadingOrLowest(text: unknown): number {
   return parseBidMeterReading(String(text)) ?? Number.NEGATIVE_INFINITY
 }
 
-function meterColumn(column: ColumnDef<BidRow>): ColumnDef<BidRow> {
+function meterColumn(column: ColumnDef<BidRowWithStock>): ColumnDef<BidRowWithStock> {
   return {
     ...column,
     cell: ({ getValue }) => {
@@ -119,7 +120,7 @@ function BidModelCell({
   )
 }
 
-function modelColumn(column: ColumnDef<BidRow>): ColumnDef<BidRow> {
+function modelColumn(column: ColumnDef<BidRowWithStock>): ColumnDef<BidRowWithStock> {
   return {
     ...column,
     cell: ({ row, getValue }) => (
@@ -128,8 +129,8 @@ function modelColumn(column: ColumnDef<BidRow>): ColumnDef<BidRow> {
   }
 }
 
-function pastedColumn(column: LabelledBidColumn): ColumnDef<BidRow> {
-  const definition: ColumnDef<BidRow> = {
+function pastedColumn(column: LabelledBidColumn): ColumnDef<BidRowWithStock> {
+  const definition: ColumnDef<BidRowWithStock> = {
     id: pastedColumnId(column),
     header: column.label,
     accessorFn: (row) => row.cells[column.index] ?? '',
@@ -170,7 +171,10 @@ const EDITABLE_FIELD_DISPLAY = {
   },
 } as const satisfies Record<BidPriceField, EditableFieldDisplay>
 
-function priceColumn(field: BidPriceField, editing: BidRowEditing | undefined): ColumnDef<BidRow> {
+function priceColumn(
+  field: BidPriceField,
+  editing: BidRowEditing | undefined,
+): ColumnDef<BidRowWithStock> {
   const label = PRICING_COLUMN_LABELS[field]
   const display = EDITABLE_FIELD_DISPLAY[field]
   if (!editing) {
@@ -208,7 +212,7 @@ function priceColumn(field: BidPriceField, editing: BidRowEditing | undefined): 
   }
 }
 
-function zeroPriceColumn(editing: BidRowEditing | undefined): ColumnDef<BidRow> {
+function zeroPriceColumn(editing: BidRowEditing | undefined): ColumnDef<BidRowWithStock> {
   return {
     accessorKey: 'zero_priced',
     enableSorting: false,
@@ -228,7 +232,7 @@ function zeroPriceColumn(editing: BidRowEditing | undefined): ColumnDef<BidRow> 
   }
 }
 
-function pricingHeader(id: PricingColumnId): ColumnDef<BidRow>['header'] {
+function pricingHeader(id: PricingColumnId): ColumnDef<BidRowWithStock>['header'] {
   const label = PRICING_COLUMN_LABELS[id]
   const caption = PRICING_COLUMN_CAPTIONS[id]
   if (caption === undefined) return label
@@ -240,7 +244,10 @@ function pricingHeader(id: PricingColumnId): ColumnDef<BidRow>['header'] {
   )
 }
 
-function pricingColumn(id: PricingColumnId, column: ColumnDef<BidRow>): ColumnDef<BidRow> {
+function pricingColumn(
+  id: PricingColumnId,
+  column: ColumnDef<BidRowWithStock>,
+): ColumnDef<BidRowWithStock> {
   return {
     ...column,
     id,
@@ -253,7 +260,7 @@ function pricingColumn(id: PricingColumnId, column: ColumnDef<BidRow>): ColumnDe
   }
 }
 
-function pricingColumns(editing: BidRowEditing | undefined): ColumnDef<BidRow>[] {
+function pricingColumns(editing: BidRowEditing | undefined): ColumnDef<BidRowWithStock>[] {
   return [
     pricingColumn('selling_price', priceColumn('selling_price', editing)),
     pricingColumn('transport_cost', priceColumn('transport_cost', editing)),
@@ -274,17 +281,17 @@ function pricingColumns(editing: BidRowEditing | undefined): ColumnDef<BidRow>[]
 export function buildBidGridColumns(
   sheetColumns: readonly LabelledBidColumn[],
   editing: BidRowEditing | undefined,
-  stock: BidModelStockLookup,
-): ColumnDef<BidRow>[] {
-  const select = editing ? [createSelectColumn<BidRow>()] : []
+  months: SalesWindowMonths,
+): ColumnDef<BidRowWithStock>[] {
+  const select = editing ? [createSelectColumn<BidRowWithStock>()] : []
   const mapped = sheetColumns.filter((column) => column.role !== null).map(pastedColumn)
   const unmapped = sheetColumns.filter((column) => column.role === null).map(pastedColumn)
   return [
     ...select,
     ...mapped,
     ...unmapped,
-    ...onHandColumns(stock),
-    ...salesColumns(stock),
+    ...onHandColumns(),
+    ...salesColumns(months),
     ...pricingColumns(editing),
   ]
 }

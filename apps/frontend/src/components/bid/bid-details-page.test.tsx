@@ -1,6 +1,6 @@
 import type * as DataTableModule from '@/components/shared/data-table'
 import { TooltipProvider } from '@/components/shadcn/tooltip'
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, within } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { NuqsTestingAdapter } from 'nuqs/adapters/testing'
 import { BID_COLUMN_ROLE, BID_STATUS, type BidDetail, type BidModelStock } from 'shared-types'
@@ -231,6 +231,25 @@ describe('BidDetailsPage', () => {
     const [, matchedRow, unmatchedRow] = screen.getAllByRole('row')
     expect(matchedRow).toHaveTextContent('$650.00')
     expect(unmatchedRow).not.toHaveTextContent('$650.00')
+  })
+
+  it('shows the sales figures for a newly selected window', () => {
+    renderModelBid()
+    detail.modelStock = [{ ...MATCHED_MODEL_STOCK, sales_count: 30 }]
+    fireEvent.click(screen.getByRole('radio', { name: '12 mo' }))
+    const [, matchedRow] = screen.getAllByRole('row')
+    if (matchedRow === undefined) throw new Error('Expected the matched row')
+    expect(within(matchedRow).getByRole('cell', { name: '30' })).toBeInTheDocument()
+  })
+
+  it('fills in the stock figures when they arrive after the rows', () => {
+    renderModelBid()
+    detail.modelStock = []
+    fireEvent.click(screen.getByRole('radio', { name: '12 mo' }))
+    detail.modelStock = [MATCHED_MODEL_STOCK]
+    fireEvent.click(screen.getByRole('radio', { name: '1 mo' }))
+    const [, matchedRow] = screen.getAllByRole('row')
+    expect(matchedRow).toHaveTextContent('$650.00')
   })
 
   it('links a matched row to its price history at the selected window', () => {
