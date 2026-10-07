@@ -1,7 +1,7 @@
 import { Button } from '@/components/shadcn/button'
 import { Checkbox } from '@/components/shadcn/checkbox'
 import { PencilSimpleIcon } from '@phosphor-icons/react'
-import type { ColumnDef } from '@tanstack/react-table'
+import type { ColumnDef, Row, Table } from '@tanstack/react-table'
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 
@@ -23,14 +23,48 @@ export function IdLink({ to, children }: { to: string; children: ReactNode }) {
   )
 }
 
-function SelectHitArea({ onActivate, children }: { onActivate: () => void; children: ReactNode }) {
+const selectionAnchorRowIds = new WeakMap<object, string>()
+
+function toggleRowSelection<TData>(table: Table<TData>, row: Row<TData>, extendsRange: boolean) {
+  const newSelected = !row.getIsSelected()
+  const rows = table.getRowModel().rows
+  const prevAnchorRowId = selectionAnchorRowIds.get(table)
+  selectionAnchorRowIds.set(table, row.id)
+  const anchorIndex = extendsRange ? rows.findIndex((r) => r.id === prevAnchorRowId) : -1
+  if (anchorIndex === -1) {
+    row.toggleSelected(newSelected)
+    return
+  }
+  const rowIndex = rows.findIndex((r) => r.id === row.id)
+  const range = rows.slice(Math.min(anchorIndex, rowIndex), Math.max(anchorIndex, rowIndex) + 1)
+  table.setRowSelection((prevSelection) => {
+    const newSelection = { ...prevSelection }
+    for (const rangeRow of range) {
+      if (!rangeRow.getCanSelect()) continue
+      if (newSelected) newSelection[rangeRow.id] = true
+      else delete newSelection[rangeRow.id]
+    }
+    return newSelection
+  })
+}
+
+function SelectHitArea({
+  onActivate,
+  children,
+}: {
+  onActivate: (extendsRange: boolean) => void
+  children: ReactNode
+}) {
   return (
     <div
       className="absolute inset-0 flex cursor-pointer items-center justify-center"
+      onMouseDown={(e) => {
+        if (e.shiftKey) e.preventDefault()
+      }}
       onClick={(e) => {
         e.stopPropagation()
         if ((e.target as HTMLElement).closest('[role=checkbox]')) return
-        onActivate()
+        onActivate(e.shiftKey)
       }}
     >
       {children}
@@ -70,11 +104,14 @@ export function createSelectColumn<TData>(): ColumnDef<TData> {
         />
       </SelectHitArea>
     ),
-    cell: ({ row }) => (
-      <SelectHitArea onActivate={() => row.toggleSelected()}>
+    cell: ({ row, table }) => (
+      <SelectHitArea onActivate={(extendsRange) => toggleRowSelection(table, row, extendsRange)}>
         <Checkbox
           checked={row.getIsSelected()}
-          onCheckedChange={(value) => row.toggleSelected(!!value)}
+          onClick={(e) => {
+            e.preventDefault()
+            toggleRowSelection(table, row, e.shiftKey)
+          }}
           aria-label="Select row"
         />
       </SelectHitArea>
