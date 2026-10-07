@@ -191,20 +191,39 @@ describe('BidDetailsPage', () => {
     expect(screen.getByRole('cell', { name: 'IP 1135+' })).toBeInTheDocument()
   })
 
-  it('places In Stock and Held after the recognised columns, and the sales figures before Selling Price', () => {
+  it('groups the stock and sales columns after the pasted columns, right before Selling Price', () => {
     renderModelBid()
     const labels = screen
       .getAllByRole('columnheader')
       .map((header) => header.textContent?.split('(')[0]?.trim() ?? '')
       .filter((label) => label !== '')
-    const modelAt = labels.indexOf('Model')
-    expect(labels.slice(modelAt, modelAt + 4)).toEqual(['Model', 'In Stock', 'Held', 'Location'])
     const sellingAt = labels.indexOf('Selling Price')
-    expect(labels.slice(sellingAt - 3, sellingAt)).toEqual([
+    expect(labels.slice(sellingAt - 6, sellingAt)).toEqual([
+      'Location',
+      'In Stock',
+      'Held',
       'Median Sale Price',
       'Sales',
       'Price History',
     ])
+  })
+
+  it('colours the stock and sales headers violet', () => {
+    renderModelBid()
+    expect(screen.getByRole('columnheader', { name: /In Stock/ })).toHaveClass('bg-violet-100')
+    expect(screen.getByRole('columnheader', { name: /Price History/ })).toHaveClass('bg-violet-100')
+  })
+
+  it('hides and restores the stock and sales columns with the Sales Data switch', () => {
+    renderModelBid()
+    const salesData = screen.getByRole('switch', { name: 'Sales Data' })
+    expect(salesData).toBeChecked()
+    fireEvent.click(salesData)
+    expect(salesData).not.toBeChecked()
+    expect(screen.queryByRole('columnheader', { name: /In Stock/ })).not.toBeInTheDocument()
+    expect(screen.queryByRole('columnheader', { name: /Price History/ })).not.toBeInTheDocument()
+    fireEvent.click(salesData)
+    expect(screen.getByRole('columnheader', { name: /In Stock/ })).toBeInTheDocument()
   })
 
   it("shows the matched model's figures and leaves an unmatched row blank", () => {

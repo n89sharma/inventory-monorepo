@@ -282,8 +282,8 @@ export function buildBidGridColumns(
   return [
     ...select,
     ...mapped,
-    ...onHandColumns(stock),
     ...unmapped,
+    ...onHandColumns(stock),
     ...salesColumns(stock),
     ...pricingColumns(editing),
   ]

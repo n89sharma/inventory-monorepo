@@ -8,6 +8,7 @@ import {
   type BidPriceField,
   type BidRowEditing,
 } from '@/components/bid/bid-row-table-columns'
+import { stockPickerColumns } from '@/components/bid/bid-stock-columns'
 import { BidLifecycleActions } from '@/components/bid/bid-lifecycle-actions'
 import { BidOutcomeBadge, BidStatusBadge, BidWarningBadge } from '@/components/bid/bid-status-badge'
 import { BidTotalsStrip } from '@/components/bid/bid-totals-strip'
@@ -25,6 +26,8 @@ import {
 import { GridDetailsPageHeader } from '@/components/collections/sticky-details-page-header'
 import { AlertDialogDescription } from '@/components/shadcn/alert-dialog'
 import { Button } from '@/components/shadcn/button'
+import { Label } from '@/components/shadcn/label'
+import { Switch } from '@/components/shadcn/switch'
 import { Separator } from '@/components/shadcn/separator'
 import {
   DropdownMenu,
@@ -51,7 +54,7 @@ import { queryStringFrom } from '@/ui-types/navigation-context'
 import { DotsThreeVerticalIcon, PencilSimpleIcon, TrashIcon } from '@phosphor-icons/react'
 import type { RowSelectionState, TableOptions, VisibilityState } from '@tanstack/react-table'
 import { useOptimisticSearchParams } from 'nuqs/adapters/react-router/v7'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useId, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { bidCsvColumns, bidCsvFilename } from '@/lib/bid-csv'
 import { toCsv } from '@/lib/csv'
@@ -72,6 +75,8 @@ const getBidRowId = (row: BidRow) => String(row.id)
 const CSV_MIME_TYPE = 'text/csv'
 const NO_MODEL_STOCK: BidModelStock[] = []
 const SENT_STATUSES: string[] = [BID_STATUS.SUBMITTED, BID_STATUS.CONCLUDED]
+const SALES_DATA_LABEL = 'Sales Data'
+const SALES_DATA_COLUMN_IDS = stockPickerColumns().map((column) => column.id)
 
 type ReviewBlocker = { badge: string; reason: string }
 
@@ -95,6 +100,24 @@ function BidDownloadButton({ bid }: { bid: BidDetail }): React.JSX.Element {
     downloadFile(bidCsvFilename(bid), new Blob([csv], { type: CSV_MIME_TYPE }))
   }
   return <ExportCsvButton loading={false} disabled={bid.rows.length === 0} onClick={download} />
+}
+
+function SalesDataSwitch({
+  checked,
+  onCheckedChange,
+}: {
+  checked: boolean
+  onCheckedChange: (checked: boolean) => void
+}): React.JSX.Element {
+  const switchId = useId()
+  return (
+    <div className="flex items-center gap-1.5">
+      <Switch id={switchId} checked={checked} onCheckedChange={onCheckedChange} />
+      <Label htmlFor={switchId} className="cursor-pointer text-sm font-normal">
+        {SALES_DATA_LABEL}
+      </Label>
+    </div>
+  )
 }
 
 type BulkDialog = 'margin' | 'freight'
@@ -208,6 +231,17 @@ function BidDetailsContent({ bid }: { bid: BidDetail }): React.JSX.Element {
   const columnVisibility: VisibilityState = Object.fromEntries(
     [...hiddenColumnIds].map((id) => [id, false]),
   )
+
+  const salesDataShown = SALES_DATA_COLUMN_IDS.every((id) => !hiddenColumnIds.has(id))
+
+  function showSalesData(shown: boolean) {
+    const newHiddenIds = new Set(hiddenColumnIds)
+    for (const id of SALES_DATA_COLUMN_IDS) {
+      if (shown) newHiddenIds.delete(id)
+      else newHiddenIds.add(id)
+    }
+    setHiddenColumnIds(newHiddenIds)
+  }
 
   function showColumns(newVisibleIds: Set<string>) {
     setHiddenColumnIds(
@@ -331,6 +365,7 @@ function BidDetailsContent({ bid }: { bid: BidDetail }): React.JSX.Element {
         columnVisibility={columnVisibility}
         renderToolbar={(table) => (
           <TableToolbarEnd>
+            <SalesDataSwitch checked={salesDataShown} onCheckedChange={showSalesData} />
             <SalesWindowToggle
               months={months}
               onMonthsChange={setMonths}

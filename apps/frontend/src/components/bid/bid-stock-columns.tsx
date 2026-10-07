@@ -18,6 +18,8 @@ const STOCK_COLUMN_LABELS = {
 type StockFigure = Exclude<keyof typeof STOCK_COLUMN_LABELS, 'price_history'>
 
 const STOCK_CELL_CLASS = 'text-center tabular-nums'
+const STOCK_HEADER_CLASS = 'bg-violet-100 text-violet-900 dark:bg-violet-950 dark:text-violet-100'
+const STOCK_COLUMN_META = { cellClassName: STOCK_CELL_CLASS, headerClassName: STOCK_HEADER_CLASS }
 
 export type BidModelStockLookup = {
   byModel: ReadonlyMap<number, BidModelStock>
@@ -41,7 +43,7 @@ function figureColumn(
       const value = getValue<number | undefined>()
       return value === undefined ? '' : format(value)
     },
-    meta: { cellClassName: STOCK_CELL_CLASS },
+    meta: STOCK_COLUMN_META,
   }
 }
 
@@ -50,7 +52,7 @@ function priceHistoryColumn(lookup: BidModelStockLookup): ColumnDef<BidRow> {
     id: 'price_history',
     header: STOCK_COLUMN_LABELS.price_history,
     enableSorting: false,
-    meta: { cellClassName: STOCK_CELL_CLASS },
+    meta: STOCK_COLUMN_META,
     cell: ({ row }) => {
       const { model } = row.original
       if (model === null) return null
