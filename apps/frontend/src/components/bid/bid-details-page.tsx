@@ -21,6 +21,7 @@ import { MapBidColumnsDialog } from '@/components/bid/map-bid-columns-dialog'
 import {
   SetBidRowsFreightDialog,
   SetBidRowsMarginDialog,
+  SetBidRowsSellingPriceDialog,
 } from '@/components/bid/set-bid-rows-value-dialog'
 import { UploadBidRowsDialog } from '@/components/bid/upload-bid-rows-dialog'
 import {
@@ -124,7 +125,7 @@ function SalesDataSwitch({
   )
 }
 
-type BulkDialog = 'margin' | 'freight'
+type BulkDialog = 'selling_price' | 'margin' | 'freight'
 
 export function BidDetailsPage(): React.JSX.Element {
   const { collectionId = '' } = useParams()
@@ -263,6 +264,7 @@ function BidDetailsContent({ bid }: { bid: BidDetail }): React.JSX.Element {
   }
 
   async function applyToSelection(update: {
+    selling_price?: number
     transport_cost?: number
     margin_percent?: number
     zero_priced?: boolean
@@ -337,6 +339,13 @@ function BidDetailsContent({ bid }: { bid: BidDetail }): React.JSX.Element {
           This permanently removes the bid and its rows. It cannot be undone.
         </AlertDialogDescription>
       </DeleteEntityDialog>
+      {bulkDialog === 'selling_price' && (
+        <SetBidRowsSellingPriceDialog
+          onOpenChange={() => setBulkDialog(null)}
+          rowCount={selectedRowIds.length}
+          onApply={(price) => applyToSelection({ selling_price: price })}
+        />
+      )}
       {bulkDialog === 'margin' && (
         <SetBidRowsMarginDialog
           onOpenChange={() => setBulkDialog(null)}
@@ -401,6 +410,9 @@ function BidDetailsContent({ bid }: { bid: BidDetail }): React.JSX.Element {
               onClear={clearSelection}
               itemNoun={ROW_NOUN}
             >
+              <Button variant="secondary" onClick={() => setBulkDialog('selling_price')}>
+                Set selling price
+              </Button>
               <Button variant="secondary" onClick={() => setBulkDialog('margin')}>
                 Set margin
               </Button>

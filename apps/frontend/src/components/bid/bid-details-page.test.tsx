@@ -1,6 +1,6 @@
 import type * as DataTableModule from '@/components/shared/data-table'
 import { TooltipProvider } from '@/components/shadcn/tooltip'
-import { fireEvent, render, screen, within } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { NuqsTestingAdapter } from 'nuqs/adapters/testing'
 import { BID_COLUMN_ROLE, BID_STATUS, type BidDetail, type BidModelStock } from 'shared-types'
@@ -23,6 +23,7 @@ vi.mock('@/components/shared/data-table', async (importOriginal) => {
 })
 
 const removeRows = vi.hoisted(() => vi.fn())
+const updateRows = vi.hoisted(() => vi.fn())
 
 vi.mock('@/hooks/use-bid-mutations', () => ({
   useBidMutations: () => ({
@@ -31,7 +32,7 @@ vi.mock('@/hooks/use-bid-mutations', () => ({
     remove: vi.fn(),
     updateMetadata: vi.fn(),
     upload: vi.fn(),
-    updateRows: vi.fn(),
+    updateRows,
     mapColumns: vi.fn(),
     setNoBid: vi.fn(),
     review: vi.fn(),
@@ -138,6 +139,17 @@ describe('BidDetailsPage', () => {
     expect(screen.getByRole('button', { name: 'Selling Price for row 1' })).toBeInTheDocument()
     expect(screen.getByRole('checkbox', { name: 'No Bid for row 1' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Margin % for row 1' })).toHaveTextContent('20%')
+  })
+
+  it('sets the selling price on the selected rows from the bulk bar', async () => {
+    renderPage(BID_STATUS.DRAFT)
+    fireEvent.click(screen.getByRole('checkbox', { name: 'Select row' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Set selling price' }))
+    fireEvent.change(screen.getByLabelText('Selling Price'), { target: { value: '1250' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }))
+    await waitFor(() =>
+      expect(updateRows).toHaveBeenCalledWith(BID_NUMBER, { row_ids: [11], selling_price: 1250 }),
+    )
   })
 
   it('removes the selected rows from the bulk bar', () => {

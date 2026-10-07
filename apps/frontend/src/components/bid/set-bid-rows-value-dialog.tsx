@@ -107,23 +107,35 @@ export function SetBidRowsMarginDialog({
   )
 }
 
-export function SetBidRowsFreightDialog({
+function SetBidRowsPriceDialog({
   onOpenChange,
+  title,
+  label,
   rowCount,
   onApply,
-}: SetBidRowsAmountDialogProps): React.JSX.Element {
+}: SetBidRowsAmountDialogProps & { title: string; label: string }): React.JSX.Element {
   const [value, setValue] = useState('')
-  const freight = parseFloat(value)
-  const valid = !Number.isNaN(freight)
+  const price = parseFloat(value)
+  const valid = !Number.isNaN(price)
   return (
     <SetBidRowsValueDialog
       onOpenChange={onOpenChange}
-      title="Set freight"
+      title={title}
       rowCount={rowCount}
       canSave={valid}
-      onSave={() => (valid ? onApply(freight) : Promise.resolve())}
+      onSave={() => (valid ? onApply(price) : Promise.resolve())}
     >
-      <PriceInput autoFocus label="Freight" value={value} onChange={setValue} />
+      <PriceInput autoFocus label={label} value={value} onChange={setValue} />
     </SetBidRowsValueDialog>
   )
+}
+
+export function SetBidRowsFreightDialog(props: SetBidRowsAmountDialogProps): React.JSX.Element {
+  return <SetBidRowsPriceDialog {...props} title="Set freight" label="Freight" />
+}
+
+export function SetBidRowsSellingPriceDialog(
+  props: SetBidRowsAmountDialogProps,
+): React.JSX.Element {
+  return <SetBidRowsPriceDialog {...props} title="Set selling price" label="Selling Price" />
 }
